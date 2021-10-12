@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skillap.MVC", "Skillap.MVC\Skillap.MVC.csproj", "{FC9B1456-4F28-4D65-9121-01B4F6503498}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skillar.DAL", "Skillar.DAL\Skillar.DAL.csproj", "{23E9F974-3D34-4D92-938A-8138B03ACC54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skillap.DAL", "Skillar.DAL\Skillap.DAL.csproj", "{23E9F974-3D34-4D92-938A-8138B03ACC54}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skillap.BLL", "Skillap.BLL\Skillap.BLL.csproj", "{15D508AF-19FA-4BA6-9722-22ECC2AACE6B}"
 EndProject
