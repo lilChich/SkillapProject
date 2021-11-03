@@ -21,7 +21,10 @@ namespace Skillap.DAL.EF
         public DbSet<Tags> Tags { get; set; }
         public DbSet<Post_Tags> PostsTags { get; set; }
 
-
+        public DataContext(DbContextOptions<DataContext> options)
+           : base(options)
+        {
+        }
 
         public DataContext()
         {

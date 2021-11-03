@@ -15,7 +15,7 @@ namespace Skillap.DAL.EF.MappingConfigurations
         {
             builder.ToTable("AspNetUsers", "dbo");
 
-            builder.HasKey(x => new { x.Id });
+            builder.HasKey(x => new { x.Id });           
         }
     }
 }

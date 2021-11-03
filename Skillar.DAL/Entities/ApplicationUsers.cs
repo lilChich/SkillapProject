@@ -30,7 +30,7 @@ namespace Skillap.DAL.Entities
         [Required]
         [MaxLength(200)]
         public string Education { get; set; }
-        public byte?[] Image { get; set; }
+        public string Image { get; set; }
 
         public IList<Masters> Masters { get; set; }
         public IList<Liked_Comments> CommentsLiked { get; set; }
