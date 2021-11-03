@@ -17,6 +17,9 @@ namespace Skillap.DAL.Entities
         [MaxLength(30)]
         public string SecondName { get; set; }
         [Required]
+        [MaxLength(30)]
+        public string NickName { get; set; }
+        [Required]
         public bool Gender { get; set; }
         [Required]
         public DateTime DateOfBirth { get; set; }
@@ -27,7 +30,7 @@ namespace Skillap.DAL.Entities
         [Required]
         [MaxLength(200)]
         public string Education { get; set; }
-        public byte[] Image { get; set; }
+        public byte?[] Image { get; set; }
 
         public IList<Masters> Masters { get; set; }
         public IList<Liked_Comments> CommentsLiked { get; set; }
