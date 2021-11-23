@@ -20,9 +20,22 @@ namespace Skillap.DAL.Repositories
         private EFGenericRepository<MasterClasses> masterClassesRepository;
         private EFGenericRepository<Tags> tagsRepository;
         private EFGenericRepository<Post_Tags> postsTagsRepository;
+        private EFGenericRepository<ApplicationUsers> applicationUsers;
 
         public EFUnitOfWork()
         {
+        }
+
+        public EFGenericRepository<ApplicationUsers> ApplicationUsers
+        {
+            get
+            {
+                if (this.applicationUsers == null)
+                {
+                    this.applicationUsers = new EFGenericRepository<ApplicationUsers>(db);
+                }
+                return applicationUsers;
+            }
         }
 
         public EFGenericRepository<Comments> Comments

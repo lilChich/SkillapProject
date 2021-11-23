@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Skillap.DAL.Migrations
 {
-    public partial class DataBaseCreation : Migration
+    public partial class CreationOfDataBase : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,11 +33,12 @@ namespace Skillap.DAL.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     SecondName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    NickName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(35)", maxLength: 35, nullable: false),
                     Education = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

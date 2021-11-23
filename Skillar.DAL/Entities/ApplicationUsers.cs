@@ -16,18 +16,18 @@ namespace Skillap.DAL.Entities
         [Required]
         [MaxLength(30)]
         public string SecondName { get; set; }
-        [Required]
+
         [MaxLength(30)]
         public string NickName { get; set; }
-        [Required]
+
         public bool Gender { get; set; }
-        [Required]
+
         public DateTime DateOfBirth { get; set; }
         [Required]
         [MinLength(2)]
         [MaxLength(35)]
         public string Country { get; set; }
-        [Required]
+
         [MaxLength(200)]
         public string Education { get; set; }
         public string Image { get; set; }

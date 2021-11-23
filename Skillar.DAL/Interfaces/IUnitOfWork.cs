@@ -19,6 +19,7 @@ namespace Skillap.DAL.Interfaces
         EFGenericRepository<MasterClasses> MasterClasses { get; }
         EFGenericRepository<Tags> Tags { get; }
         EFGenericRepository<Post_Tags> PostsTags { get; }
+        EFGenericRepository<ApplicationUsers> ApplicationUsers { get; }
         void Save();
     }
 }

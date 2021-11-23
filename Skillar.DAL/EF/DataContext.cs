@@ -38,6 +38,7 @@ namespace Skillap.DAL.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            //modelBuilder.Entity<ApplicationUsers>().Property(x => x.Image).IsRequired(false);
             base.OnModelCreating(modelBuilder);
         }
     }
