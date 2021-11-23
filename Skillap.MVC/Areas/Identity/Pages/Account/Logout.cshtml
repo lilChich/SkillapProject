@@ -1,0 +1,33 @@
+﻿@page
+@model LogoutModel
+@{
+    ViewData["Title"] = "Log out";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card login-logout-tab mb-lg-5 mt-lg-2">
+                    <div class="card-header">
+                        <h2 id="main_text_authorization" class="text-center pt-1">Are you sure?</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form id="account" method="post" asp-route-returnUrl="@Url.Page("/", new { area = "" })">
+                                    <button id="buttons_auth" value="Sign Out" class="btn btn-primary btn-block" type="submit">Sign Out</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>You have successfully logged out of the application.</p>
+    }
+}

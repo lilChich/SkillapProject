@@ -1,8 +1,123 @@
-﻿@{
+﻿@using Skillap.BLL.Interfaces.IServices;
+@inject IAuthService userService;
+
+@{
     ViewData["Title"] = "Home Page";
+
+    var user = await userService.GetUserAsync(User.Identity.Name);
+
+    var photoPath = "~/images/" + user.Image ?? "user.png";
+
+
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container pb-5 mb-5">
+    <div class="row pt-5 mb-10">
+        <div class="col">
+            <div class="card">
+                <img src="~/images/communication2.jpg" class="card-img-top" alt="Alternate Text" />
+                <div class="card-body">
+                    <h5 class="card-title text-center">A public platform building the definitive collection of questions & answers</h5>
+                    <p class="card-text text-center">A community-based space to find and contribute answers to technical and other challenges, and one of the most popular websites in the world.</p>
+                    <p class="card-text text-center">Try it right now</p>
+                    <div class="card-text text-center">
+                        <a class="" asp-controller="Account" asp-action="Login">
+                            <div id="buttons">Join Community</div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-555">
+                <img src="~/images/pngwing.com.png" class="card-img-top" alt="Alternate Text" />
+                <div class="card-body">
+                    <h5 id="add_text_home_zag" class="card-title text-center text-black">Sharing practical experience and knowledge with people all around the world</h5>
+                    <p class="card-text text-center">You can ask a question on any topic and get an answer to it quickly enough. People should help solve the hardest questions. And don't forget about master classes.</p>
+                    <p class="card-text text-center">Get started</p>
+                    <div class="card-text text-center">
+                        <a class="" asp-controller="Account" asp-action="Login">
+                            <div id="buttons">Ask Question</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*<div class="container pt-4 mt-4 pb-4">
+        <div class="row pb-5">
+            <div class="col-1">
+
+            </div>
+            <div class="col-1 mt-2">
+                <i class="fas fa-comments fa-4x text-white"></i>
+            </div>
+            <div class="col ml-4">
+                <h2 id="add_text_home">Create chats to keep in touch any time you want</h2>
+                <p id="add_text_home_zag" class="mb-2">Use chat messages to share information in traditional way</p>
+            </div>
+        </div>
+        <div class="row pb-5">
+            <div class="col-1">
+
+            </div>
+            <div class="col-1 text-center mt-2">
+                <i class="fas fa-microphone fa-4x text-white"></i>
+            </div>
+            <div class="col ml-4">
+                <h2 id="add_text_home">Share voice messages</h2>
+                <p id="add_text_home_zag">Use voice messages to tell something you can't describe in text</p>
+            </div>
+        </div>
+        <div class="row pb-5">
+            <div class="col-1">
+
+            </div>
+            <div class="col-1 text-center mt-2">
+                <i class="fas fa-search fa-4x text-white"></i>
+            </div>
+            <div class="col ml-4">
+                <h2 id="add_text_home">Connect to other servers</h2>
+                <p id="add_text_home_zag">Find interesting servers via recommendations or by invite links to join</p>
+            </div>
+        </div>
+        <div class="row pb-5 mb-4">
+            <div class="col-1">
+
+            </div>
+            <div class="col-1 text-center mt-2">
+                <i class="fas fa-user-md fa-4x text-white"></i>
+            </div>
+            <div class="col ml-4">
+                <h2 id="add_text_home">Review your server activity as administrator</h2>
+                <p id="add_text_home_zag">Set up server for your purposes and moderate it by yourself</p>
+            </div>
+        </div>
+    </div>*@
+
+
+<div class="container pb-5 mb-5">
+    <div class="row">
+        <div class="col">
+            <p id="add_text_home_main_footer" class="text-center text-white">Try out Premium!</p>
+        </div>
+    </div>
+    <div class="row pb-4 pt-4">
+        <div class="col-2"></div>
+        <div class="col">
+            <p id="add_text_home_footer" class="text-center text-white">Unlock Premium access with plenty of cool features that will increase your productivity and give extended resourses for your wishes</p>
+        </div>
+        <div class="col-2"></div>
+    </div>
+    <div class="row pb-5 mb-5">
+        <div class="col text-center">
+            <a class="">
+                <div id="buttons" class="text-center">Find Out More</div>
+            </a>
+        </div>
+    </div>
 </div>

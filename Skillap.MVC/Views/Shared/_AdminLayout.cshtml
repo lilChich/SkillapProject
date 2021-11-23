@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authService
+
+@{
+    ViewData["Title"] = "My Account";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="menu position-absolute">
+                    @if (User.IsInRole("Teacher"))
+                    {
+                        <p class="menu-label">Menu</p>
+                        <ul class="menu-list">
+                            <li><a asp-controller="Account" asp-action="EditProfile">Edit Profile</a></li>
+                            <li><a asp-page="/Account/MySubjects">My Subjects</a></li>
+                            <li><a asp-page="/Account/MyMarks">My Marks</a></li>
+                            <li><a asp-page="/Account/Schedule">My Schedule</a></li>
+                        </ul>
+                    }
+
+                    @if (User.IsInRole("Student"))
+                    {
+                        <p class="menu-label">Menu</p>
+                        <ul class="menu-list">
+                            <li><a asp-page="/Admin/ConfigureStudents">Configure Students</a></li>
+                            <li><a asp-page="/Admin/ConfigureTeachers">Configure Teachers</a></li>
+                        </ul>
+                    }
+                    <p class="menu-label"></p>
+                    <ul class="menu-list">
+                        <li><a asp-page="/Index">Back to Main</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                @RenderBody()
+            </div>
+        </div>
+    </div>*@
+
+<div class="row pb-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs nav-fill">
+
+                    @if (User.IsInRole("Student"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="EditProfile">Edit Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Account/MySubjects">My Subjects</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Account/MyMarks">My Marks</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Account/Schedule">My Schedule</a></li>
+                    }
+
+                    @if (User.IsInRole("Teacher"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="EditProfile">Edit Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="MySubjects">My Subjects</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Account/Schedule">My Schedule</a></li>
+                    }
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="ListOfStudents">Manage Students</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="ListOfTeachers">Manage Teachers</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Account/Schedule">Manage Subjects</a></li>
+                    }
+
+                </ul>
+            </div>
+            <div class="card-content">
+                <div class="row">
+                    <div class="col-md-12">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+
+    <script>
+    $(function () {
+        var current = location.pathname;
+        $('.nav-tabs li a').each(function () {
+            var $this = $(this);
+            if (current.indexOf($this.attr('href')) !== -1) {
+                $this.addClass('active');
+            }
+        })
+    })
+    </script>
+
+
+}

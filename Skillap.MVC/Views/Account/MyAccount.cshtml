@@ -1,0 +1,191 @@
+﻿@model Skillap.MVC.ViewModels.UserViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class=" col-md-10 offset-md-1 mt-3">
+        <form method="post" class="mt-3">
+            <div class="form-group row">
+                <label id="add_text" asp-for="Image" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Image" class="form-control">
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="NickName" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="NickName" class="form-control">
+                    <span asp-validation-for="NickName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="Email" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Email" class="form-control">
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="FirstName" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="FirstName" class="form-control">
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="SecondName" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="SecondName" class="form-control">
+                    <span asp-validation-for="SecondName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="DayOfBirth" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="DayOfBirth" class="form-control">
+                    <span asp-validation-for="DayOfBirth" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="Gender" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    @Html.RadioButtonFor(model => model.Gender, true) Male
+                    @Html.RadioButtonFor(model => model.Gender, false) Female
+                </div>
+
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="Education" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Education" class="form-control">
+                    <span asp-validation-for="Education" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label id="add_text" asp-for="Country" class="col-sm-2 col-form-label text-left"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Country" class="form-control">
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group row">
+
+                <div class="col-sm-12 d-flex justify-content-end">
+                    <button id="buttons_auth" type="submit" class="btn btn-primary mr-2">Update</button>
+                    <a id="buttons_auth" asp-controller="Home" asp-action="Index" class="btn btn-primary">Cancel</a>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+
+@*<div>
+    <h4>UserDTO</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SecondName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SecondName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NickName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NickName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Gender)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DateOfBirth)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Country)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Country)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Education)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Education)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Image)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Image)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ConfirmedEmail)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ConfirmedEmail)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RememberMe)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RememberMe)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Token)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Token)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Role)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Role)
+        </dd>
+    </dl>
+</div>*@
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>
