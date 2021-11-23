@@ -6,6 +6,7 @@ using Skillap.BLL.Exceptions;
 using Skillap.BLL.Interfaces.JWT;
 using Skillap.DAL.EF;
 using Skillap.DAL.Entities;
+using Skillap.DAL.Interfaces;
 using System;
 using System.Linq;
 using System.Net;
@@ -19,12 +20,14 @@ namespace Skillap.BLL.User.Registration
         private readonly UserManager<ApplicationUsers> userManager;
         private readonly IJwtGenerator jwtGenerator;
         private readonly DataContext context;
+        private readonly IUnitOfWork uow;
 
-        public RegistrationHandler(DataContext Context, UserManager<ApplicationUsers> UserManager, IJwtGenerator JwtGenerator)
+        public RegistrationHandler(DataContext Context, UserManager<ApplicationUsers> UserManager, IJwtGenerator JwtGenerator, IUnitOfWork UoW)
         {
             context = Context;
             userManager = UserManager;
             jwtGenerator = JwtGenerator;
+            uow = UoW;
         }
 
 
@@ -68,8 +71,8 @@ namespace Skillap.BLL.User.Registration
                     Country = user.Country,
                     Education = user.Education,
                     Image = user.Image,
-                    Token = jwtGenerator.CreateToken(user)
-
+                    Token = jwtGenerator.CreateToken(user),
+                    Email = user.Email
                 };
             }
 
