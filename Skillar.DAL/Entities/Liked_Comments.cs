@@ -9,7 +9,8 @@ namespace Skillap.DAL.Entities
     public class Liked_Comments
     {
         public int Id { get; set; }
-        public int Score { get; set; }
+        public int? Score { get; set; }
+        public Nullable<bool> Like { get; set; }
 
         public int UserId { get; set; }
         public ApplicationUsers ApplicationUser { get; set; }

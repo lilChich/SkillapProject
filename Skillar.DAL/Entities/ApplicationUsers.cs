@@ -22,8 +22,8 @@ namespace Skillap.DAL.Entities
 
         public bool Gender { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
-        [Required]
+        public DateTime? DateOfBirth { get; set; }
+
         [MinLength(2)]
         [MaxLength(35)]
         public string Country { get; set; }

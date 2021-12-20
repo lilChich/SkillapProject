@@ -12,6 +12,7 @@ namespace Skillap.DAL.Interfaces
         //Task<IEnumerable<TEntity>> GetAllAsync();
         IEnumerable<TEntity> GetAll();
         Task<TEntity> GetByIdAsync(int id);
+        Task<TEntity> GetByNameAsync(string name);
         //Task<TEntity> GetByEmailAsync(TEntity entity);
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, Boolean>> predicate);
         Task CreateAsync(TEntity entity);

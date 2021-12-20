@@ -18,8 +18,7 @@ namespace Skillap.DAL.EF.MappingConfigurations
 
             builder.HasKey(x => new { x.Id });
 
-            builder.Property(p => p.Score)
-               .IsRequired();
+            builder.Property(p => p.Score);
 
             builder.HasOne(x => x.ApplicationUser)
                 .WithMany(x => x.CommentsLiked)

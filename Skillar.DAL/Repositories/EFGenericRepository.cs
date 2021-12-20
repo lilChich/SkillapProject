@@ -52,6 +52,11 @@ namespace Skillap.DAL.Repositories
             return await dbSet.FindAsync(id);
         }
 
+        public virtual async Task<TEntity> GetByNameAsync(string name)
+        {
+            return await dbSet.FindAsync(name);
+        }
+
         public virtual async Task CreateAsync(TEntity entity)
         {
             if (entity != null)
