@@ -14,6 +14,7 @@ using Skillap.MVC.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 
 namespace Skillap.MVC.Controllers
 {
+
     public class AccountController : Controller
     {
         private readonly IAuthService userService;
@@ -84,6 +86,7 @@ namespace Skillap.MVC.Controllers
             {
                 ReturnUrl = returnUrl,
                 ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+                
             };
 
             if (remoteError != null)
@@ -119,18 +122,23 @@ namespace Skillap.MVC.Controllers
                 {
 
                     var user = await appUser.FindByEmailAsync(email);
-                    //var currentUser = mapper.Map<ApplicationUsers>(user);
+                    
 
                     if (user == null)
                     {
+                        var cultureInfo = new CultureInfo("de-DE");
+                        var date = info.Principal.FindFirstValue(ClaimTypes.DateOfBirth);
+                        var myImage = info.Principal.FindFirstValue("image");
+                        var myCountry = info.Principal.FindFirstValue(ClaimTypes.Country);
+
                         user = new ApplicationUsers
                         {
-                            FirstName = info.Principal.FindFirstValue(ClaimTypes.Name),
+                            FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName),
                             SecondName = info.Principal.FindFirstValue(ClaimTypes.Surname),
-                            Country = info.Principal.FindFirstValue(ClaimTypes.Country),
+                            Country = myCountry,
                             UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
                             Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                            Image = info.Principal.FindFirstValue("image"),
+                            Image = myImage,
                         };
 
                         await appUser.CreateAsync(user);
@@ -242,7 +250,7 @@ namespace Skillap.MVC.Controllers
 
             if (res.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home", registerViewModel);
             }
 
             return View(registerViewModel);
@@ -256,7 +264,7 @@ namespace Skillap.MVC.Controllers
 
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"Student with such Id cannot be found";
+                ViewBag.ErrorMessage = $"User with such Id cannot be found";
                 return View("");
             }
 
@@ -278,10 +286,20 @@ namespace Skillap.MVC.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> MyAccount(UserViewModel model)
+        public async Task<IActionResult> MyAccount(EditUserViewModel model)
         {
             if (User.IsInRole("User"))
             {
+                string uniqueFileName = null;
+
+                if (model.Image != null)
+                {
+                    string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "images");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    model.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                }
+
                 var userDto = new UserDTO()
                 {
                     Id = await userService.GetUserByIdAsync(this.User),
@@ -293,7 +311,7 @@ namespace Skillap.MVC.Controllers
                     Country = model.Country,
                     DateOfBirth = model.DayOfBirth,
                     Role = "User",
-                    Image = model.Image,
+                    Image = uniqueFileName,
                     NickName = model.NickName
                 };
 
@@ -309,26 +327,6 @@ namespace Skillap.MVC.Controllers
 
             return View(model);
         }
-        /*public async FileContentResult UserPhoto()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                var user = await userService.GetUserAsync(User.Identity.Name);
-
-                int? userId = user.Id;
-
-                if (userId == null)
-                {
-                    byte[] imageData = null;
-
-                    return File(imageData, "images/user");
-                }
-
-                var userImage = user.Image;
-
-                return new FileContentResult(userImage, "image/jpeg");
-            }
-        }*/
 
         [Authorize]
         public async Task<IActionResult> Logout()

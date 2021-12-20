@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Skillap.BLL.Interfaces.IServices;
 using Skillap.MVC.Models;
 using System;
 using System.Collections.Generic;
@@ -12,15 +14,19 @@ namespace Skillap.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IAuthService secondUserService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,
+            IAuthService secondUserService)
         {
             _logger = logger;
+            this.secondUserService = secondUserService;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var posts = secondUserService.GetAllPosts();
+            return View(posts);
         }
 
         public IActionResult Privacy()
