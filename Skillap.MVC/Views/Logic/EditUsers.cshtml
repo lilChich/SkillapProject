@@ -1,0 +1,165 @@
+﻿@model Skillap.MVC.ViewModels.EditUserViewModel
+@using Skillap.BLL.Interfaces.IServices
+@inject IAuthService userService;
+@{
+    ViewData["Title"] = "EditUsers";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var user = await userService.GetUserAsync(Model.Email);
+
+    string aboba = null;
+    string photoPath = null;
+
+    if (user.Image == null)
+    {
+        aboba = user.Image;
+        photoPath = "~/images/" + (user.Image ?? "user.png");
+    }
+    else if (user.Image.Contains("https"))
+    {
+        aboba = user.Image;
+    }
+    else
+    {
+        photoPath = "~/images/" + (user.Image ?? "user.png");
+    }
+
+    var currentImage = photoPath ?? aboba;
+}
+
+<h1>View</h1>
+
+<h4>EditUserViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" enctype="multipart/form-data" asp-action="EditUsers">
+            <input hidden asp-for="ExistingPhotoPath" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" disabled class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SecondName" class="control-label"></label>
+                <input asp-for="SecondName" class="form-control" />
+                <span asp-validation-for="SecondName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NickName" class="control-label"></label>
+                <input asp-for="NickName" class="form-control" />
+                <span asp-validation-for="NickName" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country" class="control-label"></label>
+                <input asp-for="Country" class="form-control" />
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Education" class="control-label"></label>
+                <input asp-for="Education" class="form-control" />
+                <span asp-validation-for="Education" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DayOfBirth" class="control-label"></label>
+                <input asp-for="DayOfBirth" class="form-control" />
+                <span asp-validation-for="DayOfBirth" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <button asp-action="EditUsers" type="submit" class="btn btn-primary">Update</button>
+                <a asp-action="ManageUsers" class="btn btn-primary">Cancel</a>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <div class="col-sm-10">
+                    <div class="custom-file">
+                        <input multiple asp-for="Image" class="form-control custom-file-input" />
+                        <label class="custom-file-label">Click here to change Image</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row col-sm-4 offset-4">
+                <img style="height:200px; width: auto" src="@currentImage" asp-append-version="true" />
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>User Roles</h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.Roles.Any())
+                    {
+                        foreach (var role in Model.Roles)
+                        {
+                            <h5 class="card-title">@role</h5>
+                        }
+                    }
+                    else
+                    {
+                        <h5 class="card-title">None</h5>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a href="#" style="width:auto" class="btn btn-primary">Manage Roles</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>User Claims</h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.Claims.Any())
+                    {
+                        foreach (var claim in Model.Claims)
+                        {
+                            <h5 class="card-title">@claim</h5>
+                        }
+                    }
+                    else
+                    {
+                        <h5 class="card-title">None</h5>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a href="#" style="width:auto" class="btn btn-primary">Manage Claims</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+        });
+    </script>
+}

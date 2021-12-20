@@ -1,0 +1,62 @@
+﻿@using Skillap.BLL.DTO;
+@using Skillap.DAL.Entities;
+@using Skillap.MVC.ViewModels
+@model Posts;
+@*
+   
+*@
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <span>@Model.Name</span>
+            <span>@Model.Description</span>
+            <span>@Model.CreatedTime</span>
+
+            @foreach (var pl in Model.PostsLiked.Where(i => i.PostId == Model.Id))
+            {
+                <div>
+                    <p>
+                        @Html.ActionLink("Like","Like","Logic", new { id = Model.Id })
+                    </p>
+                    <p>
+                        @if (pl.Score == null)
+                        {
+                            <p>0 --- Likes</p>
+                        }
+                        else
+                        {
+                            <p>@pl.Score --- Likes</p>
+                        }
+                    </p>
+                </div>
+                
+            }
+        </div>
+       
+
+       
+    </div>
+    <div class="row">
+        <div class="col">
+            @Html.Raw(Model.Comments)
+            @{
+                @Html.RenderPartialAsync("MainCommentView", new CommentViewModel { PostId = Model.Id, Id = 0 })
+            }
+            @foreach (var c in Model.Comments)
+            {
+
+                <div>
+                    <p>
+                        @c.Content --- @c.CreatedTime
+                    </p>
+                </div>
+
+            }
+
+        </div>
+    </div>
+    
+
+</div>

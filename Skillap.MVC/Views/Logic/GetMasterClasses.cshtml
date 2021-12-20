@@ -1,0 +1,10 @@
+﻿@using Skillap.DAL.Entities
+@using Skillap.BLL.DTO 
+@model IEnumerable<MasterClasses>
+
+<select id="masterClass" name="MasterClass">
+    @foreach (var masterClass in Model)
+    {
+        <option value="@masterClass.Level">@masterClass.Name</option>
+    }
+</select>

@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Identity;
+﻿
+@using Microsoft.AspNetCore.Identity;
 
 @using Skillap.DAL.Entities;
 @using Skillap.BLL.Interfaces.IServices;
@@ -7,8 +8,24 @@
 @{
     var user = await userService.GetUserAsync(User.Identity.Name);
 
-    var photoPath = "~/images/" + (user.Image ?? "user.png");
+    string aboba = null;
+    string photoPath = null;
 
+    if (user.Image == null)
+    {
+        aboba = user.Image;
+        photoPath = "~/images/" + (user.Image ?? "user.png");
+    }
+    else if (user.Image.Contains("https"))
+    {
+        aboba = user.Image;
+    }
+    else
+    {
+        photoPath = "~/images/" + (user.Image ?? "user.png");
+    }
+
+    var currentImage = photoPath ?? aboba;
 }
 
 <!DOCTYPE html>
@@ -19,7 +36,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link href="~/css/style.css" rel="stylesheet" asp-append-version="true"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,10 +89,22 @@
                         <li class="nav-item">
                             <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+
                         @if (signInManager.IsSignedIn(User))
                         {
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="EditProfile">Admin</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Logic" asp-action="MasterClasses">Admin</a>
+                                </li>
+
+
+                            }
                             <li class="nav-item">
-                                <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="MyAccount"><img id="user_image" class="" src="@photoPath" asp-append-version="true" /> Account</a>
+                                <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="MyAccount"><img id="user_image" class="" src="@currentImage" asp-append-version="true" /> Account</a>
 
                             </li>
 
@@ -89,23 +118,16 @@
                                 <a id="header_nav" class="nav-link text-dark" method="get" asp-controller="Account" asp-action="Login">Log In</a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="EditProfile">Admin</a>
-                            </li>
 
-
-                        }
 
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="d-flex" id="wrapper">
+    <!--<div class="d-flex" id="wrapper">-->
         <!-- Sidebar-->
-        <div class="border-end bg-white" id="sidebar-wrapper">
+        <!--<div class="border-end bg-white" id="sidebar-wrapper">
             <div class="sidebar-heading border-bottom bg-light">Start Bootstrap</div>
             <div class="list-group list-group-flush">
                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Dashboard</a>
@@ -115,18 +137,18 @@
                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Profile</a>
                 <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Status</a>
             </div>
-        </div>
+        </div>-->
         <!-- Page content wrapper-->
-        <div id="page-content-wrapper">
+        <!--<div id="page-content-wrapper">-->
             <!-- Top navigation-->
-            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+            <!--<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
                 <div class="container-fluid">
                     <button class="btn btn-primary" id="sidebarToggle">Toggle Menu</button>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 </div>
             </nav>
         </div>
-    </div>
+    </div>-->
 
     <div id="main_image" class="container">
         <p class="pb-1">

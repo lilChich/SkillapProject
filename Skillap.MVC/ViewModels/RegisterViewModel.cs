@@ -40,7 +40,7 @@ namespace Skillap.MVC.ViewModels
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Day Of Birth")]
-        public DateTime DayOfBirth { get; set; }
+        public DateTime? DayOfBirth { get; set; }
 
         [Display(Name = "Nickname")]
         public string NickName { get; set; }

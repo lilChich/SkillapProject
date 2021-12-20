@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace Skillap.MVC.ViewModels
 {
-    public class MastersViewModels
+    public class EditTagViewModel : TagViewModel
     {
-        public bool Status { get; set; }
-
-        public int SkillLevel { get; set; }
+        public int Id { get; set; }
     }
 }

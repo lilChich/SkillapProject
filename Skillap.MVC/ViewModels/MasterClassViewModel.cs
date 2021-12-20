@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Skillap.MVC.ViewModels
         public string Description { get; set; }
 
         [Required]
-        [StringLength(150, MinimumLength = 10)]
+        [StringLength(150, MinimumLength = 3)]
         [Display(Name = "Category")]
         public string Category { get; set; }
 
@@ -31,6 +32,8 @@ namespace Skillap.MVC.ViewModels
 
         public int Level { get; set; }
 
+        public List<SelectListItem> Users { get; set; }
 
+        public string SelectedUser { get; set; }
     }
 }
