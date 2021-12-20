@@ -112,7 +112,7 @@ namespace Skillap.MVC
                     {
                         var picture = context.User.GetProperty("picture").GetString();
 
-                        context.Identity.AddClaim(new Claim("picture", picture));
+                        context.Identity.AddClaim(new Claim("image", picture));
 
                         return Task.CompletedTask;
                     };
