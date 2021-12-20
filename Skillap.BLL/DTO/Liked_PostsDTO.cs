@@ -10,7 +10,7 @@ namespace Skillap.BLL.DTO
     {
         public int Id { get; set; }
         public int Score { get; set; }
-
+        public bool? Like { get; set; }
         public int UserId { get; set; }
         public int PostId { get; set; }
     }

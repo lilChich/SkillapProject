@@ -14,5 +14,7 @@ namespace Skillap.BLL.DTO
         public string Category { get; set; }
         public int Relevance { get; set; }
         public int Level { get; set; }
+
+        //public int? MasterID { get; set; }
     }
 }

@@ -22,7 +22,31 @@ namespace Skillap.BLL.Interfaces.IServices
         public Task<UserDTO> GetUserRoleAsync(ApplicationUsers user);
         public Task<bool> UpdateUserAsync(UserDTO userDto);
         public Task GetUser(int idUser);
+        public Task<ApplicationUsers> GetUserByIdAsync(int id);
+
+        public Task<IdentityResult> DeleteUserAsync(ApplicationUsers user);
+
         public Task<int> GetUserByIdAsync(ClaimsPrincipal user);
+
+        public Task<Tags> GetTagByNameAsync(string name);
+        public Tags GetTagByName(string name);
+        public Task<TagsDTO> GetTagById(int id);
+        public Task CreateTagAsync(TagsDTO tagsDto);
+        public Task<bool> UpdateTagAsync(TagsDTO tagDto);
+        public Task<bool> DeleteTag(TagsDTO tagDto);
+
+
+        public Posts GetPostByNameAndDescription(string name, string description);
+        public Task<PostsDTO> GetPostById(int id);
+        public Task CreatePostAsync(PostsDTO postsDto);
+
+        public Task CreateLikedPostAsync(Liked_PostsDTO dto);
+
+
+        public IEnumerable<UserDTO> GetAllUsersAsync();
+        public IEnumerable<TagsDTO> GetAllTags();
+        public IEnumerable<PostsDTO> GetAllPosts();
+
 
     }
 }

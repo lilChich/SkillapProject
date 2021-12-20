@@ -160,33 +160,43 @@ namespace Skillap.BLL.Service
                 return false;
             }
 
-            if (userDto.Role == "User")
+            try
             {
-                try
-                {
-                    user.Id = userDto.Id;
-                    user.FirstName = userDto.FirstName;
-                    user.SecondName = userDto.SecondName;
-                    user.DateOfBirth = userDto.DateOfBirth;
-                    user.Education = userDto.Education;
-                    user.Email = userDto.Email;
-                    user.Gender = userDto.Gender;
-                    user.Country = userDto.Country;
-                    user.Image = userDto.Image;
-                    user.NickName = userDto.NickName;
+                user.Id = userDto.Id;
+                user.FirstName = userDto.FirstName;
+                user.SecondName = userDto.SecondName;
+                user.DateOfBirth = userDto.DateOfBirth;
+                user.Education = userDto.Education;
+                user.Email = userDto.Email;
+                user.Gender = userDto.Gender;
+                user.Country = userDto.Country;
+                user.Image = userDto.Image;
+                user.NickName = userDto.NickName;
 
-                    await UserManager.UpdateAsync(user);
-                }
-                catch
-                {
-                    throw new Exception("Cannot update user");
-                }
-
+                await UserManager.UpdateAsync(user);
             }
+            catch
+            {
+                throw new Exception("Cannot update user");
+            }
+            /*if (userDto.Role == "User")
+            {
+               
+
+            }*/
 
             await SignInManager.RefreshSignInAsync(user);
 
             return true;
+        }
+
+        public async Task<IdentityResult> DeleteUserAsync(ApplicationUsers user)
+        {
+            //var user = Mapper.Map<ApplicationUsers>(userDto);
+
+            var res = await UserManager.DeleteAsync(user);
+
+            return res;
         }
 
         public Task GetUser(int idUser)
@@ -219,7 +229,7 @@ namespace Skillap.BLL.Service
                     await UoW.MasterClasses.CreateAsync(mappedMasterClass);
                     await UoW.MasterClasses.SaveAsync();
                 }
-                catch(Exception ex)
+                catch
                 {
                     throw new Exception("Cannot create Master-class");
                 }
@@ -249,7 +259,7 @@ namespace Skillap.BLL.Service
                     await UoW.MasterClasses.UpdateAsync(currentMasterClass);
                     await UoW.MasterClasses.SaveAsync();
                 }
-                catch(Exception ex)
+                catch
                 {
                     throw new Exception("Cannot update Master-class");
                 }
@@ -274,7 +284,32 @@ namespace Skillap.BLL.Service
                     await UoW.MasterClasses.DeleteAsync(currentMasterClass.Id);
                     await UoW.MasterClasses.SaveAsync();
                 }
-                catch(Exception ex)
+                catch
+                {
+                    throw new Exception("Cannot update Master-class");
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DeleteMaster(MastersDTO masterClassesDto)
+        {
+            var masterClass = await GetMasterClassById(masterClassesDto.Id);
+            var currentMasterClass = Mapper.Map<MasterClasses>(masterClass);
+
+            if (currentMasterClass == null)
+            {
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    await UoW.MasterClasses.DeleteAsync(currentMasterClass.Id);
+                    await UoW.MasterClasses.SaveAsync();
+                }
+                catch
                 {
                     throw new Exception("Cannot update Master-class");
                 }
@@ -293,6 +328,198 @@ namespace Skillap.BLL.Service
             throw new NotImplementedException();
         }
 
+        public async Task UpdateMasterClasses(MasterClasses masterClasses)
+        {
+            await UoW.MasterClasses.UpdateAsync(masterClasses);
+        }
+        
         public async Task<MasterClassesDTO> GetMasterClassById(int id) => Mapper.Map<MasterClassesDTO>(await UoW.MasterClasses.GetByIdAsync(id));
+
+        public MasterClasses GetMasterClassByNameAndDescription(string name, string description)
+        {
+            /*var masterClass = from m in Context.MasterClasses
+                              where m.Name == name
+                              where m.Description == description
+                              select m;*/
+
+            var currentMasterClass = Context.MasterClasses.Where(m => m.Name == name).Where(m => m.Description == description).FirstOrDefault();
+
+            return currentMasterClass;
+        }
+
+        public MasterClasses GetMasterClassByIdThroughDb(int id)
+        {
+            /*var masterClass = from m in Context.MasterClasses
+                              where m.Name == name
+                              where m.Description == description
+                              select m;*/
+
+            var currentMasterClass = Context.MasterClasses.Where(m => m.Id == id).FirstOrDefault();
+
+            return currentMasterClass;
+        }
+
+        public async Task<Tags> GetTagByNameAsync(string name) => (await UoW.Tags.GetByNameAsync(name));
+
+        public Tags GetTagByName(string name)
+        {
+            /*var masterClass = from m in Context.MasterClasses
+                              where m.Name == name
+                              where m.Description == description
+                              select m;*/
+
+            var currentTag = Context.Tags.Where(t => t.Name == name).FirstOrDefault();
+
+            return currentTag;
+        }
+
+        public async Task<ApplicationUsers> GetUserByIdAsync(int id) => (await UoW.ApplicationUsers.GetByIdAsync(id));
+
+        public async Task<TagsDTO> GetTagById(int id) => Mapper.Map<TagsDTO>(await UoW.Tags.GetByIdAsync(id));
+
+        public async Task<Masters> GetMasterByIdAsync(int id) => (await UoW.Masters.GetByIdAsync(id));
+
+        public IEnumerable<MasterClassesDTO> GetAllMasterClassesAsync()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<MasterClasses, MasterClassesDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<MasterClasses>, IEnumerable<MasterClassesDTO>>(UoW.MasterClasses.GetAll());
+        }
+
+        public IEnumerable<UserDTO> GetAllUsersAsync()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<ApplicationUsers, UserDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<ApplicationUsers>, IEnumerable<UserDTO>>(UoW.ApplicationUsers.GetAll());
+        }
+
+        public IEnumerable<MastersDTO> GetAllMastersAsync()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Masters, MastersDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<Masters>, IEnumerable<MastersDTO>>(UoW.Masters.GetAll());
+        }
+
+        public IEnumerable<TagsDTO> GetAllTags()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Tags, TagsDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<Tags>, IEnumerable<TagsDTO>>(UoW.Tags.GetAll());
+        }
+
+        public async Task CreateTagAsync(TagsDTO tagsDto)
+        {
+            var mappedTag = Mapper.Map<Tags>(tagsDto);
+            var tag = GetTagByName(tagsDto.Name);
+
+            if (tag != null)
+            {
+                return;
+            }
+            else
+            {
+                try
+                {
+                    await UoW.Tags.CreateAsync(mappedTag);
+                }
+                catch
+                {
+                    throw new Exception("Cannot create tag");
+                }
+            }
+        }
+
+        public async Task<bool> UpdateTagAsync(TagsDTO tagDto)
+        {
+            var tag = await GetTagByNameAsync(tagDto.Name);
+            var currentTag = Mapper.Map<Tags>(tag);
+
+            if ((currentTag != null) && (currentTag.Id != tagDto.Id))
+            {
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    currentTag.Id = tagDto.Id;
+                    currentTag.Name = tagDto.Name;
+
+                    await UoW.Tags.UpdateAsync(currentTag);
+                }
+                catch
+                {
+                    throw new Exception("Cannot update Tag");
+                }
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DeleteTag(TagsDTO tagDto)
+        {
+            var tag = await GetTagByNameAsync(tagDto.Name);
+            var currentTag = Mapper.Map<Tags>(tag);
+
+            if (currentTag == null)
+            {
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    await UoW.Tags.DeleteAsync(currentTag.Id);
+                }
+                catch
+                {
+                    throw new Exception("Cannot delete Tag");
+                }
+            }
+
+            return true;
+        }
+
+        public IEnumerable<PostsDTO> GetAllPosts()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Posts, PostsDTO>()).CreateMapper();
+            return mapper.Map<IEnumerable<Posts>, IEnumerable<PostsDTO>>(UoW.Posts.GetAll());
+        }
+
+        public Posts GetPostByNameAndDescription(string name, string description)
+        {
+            var currentPost = Context.Posts.Where(p => p.Name == name).Where(p => p.Description == description).FirstOrDefault();
+
+            return currentPost;
+        }
+
+        public async Task<PostsDTO> GetPostById(int id) => Mapper.Map<PostsDTO>(await UoW.Posts.GetByIdAsync(id));
+
+        public async Task CreatePostAsync(PostsDTO postsDto)
+        {
+            var mappedPost = Mapper.Map<Posts>(postsDto);
+
+           
+                try
+                {
+                    await UoW.Posts.CreateAsync(mappedPost);
+                }
+                catch 
+                {
+                    throw new Exception("Cannot create post");
+                }
+            
+        }
+
+        public async Task CreateLikedPostAsync(Liked_PostsDTO dto)
+        {
+            var mappedLikedPost = Mapper.Map<Liked_Posts>(dto);
+
+            try
+            {
+                await UoW.LikedPosts.CreateAsync(mappedLikedPost);
+            }
+            catch
+            {
+                throw new Exception("Cannot create likedPost");
+            }
+        }
     }
 }
+    

@@ -13,7 +13,7 @@ namespace Skillap.BLL.DTO
         public string SecondName { get; set; }
         public string NickName { get; set; }
         public bool Gender { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public string Country { get; set; }
         public string Education { get; set; }
         public string Image { get; set; }
