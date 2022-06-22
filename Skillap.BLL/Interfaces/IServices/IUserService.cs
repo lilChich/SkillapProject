@@ -14,6 +14,7 @@ namespace Skillap.BLL.Interfaces.IServices
     {
         public Task<IdentityResult> AddUserAsync(UserDTO userDto, bool isPersistent);
         public Task<UserDTO> Login(UserDTO userDto);
+        public Task<IdentityResult> ChangePasswordAsync(UserDTO userDto, string currentPassword, string newPassword);
         public Task SignOut();
 
         public Task<UserDTO> GetUserAsync(string email);

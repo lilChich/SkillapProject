@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Skillap.BLL.DTO;
+using Skillap.BLL.Exceptions;
 using Skillap.BLL.Interfaces.IServices;
 using Skillap.BLL.Interfaces.JWT;
 using Skillap.DAL.EF;
@@ -58,29 +59,43 @@ namespace Skillap.BLL.Service
 
         public async Task<UserDTO> Login(UserDTO userDto)
         {
-            var user = await UserManager.FindByEmailAsync(userDto.Email);
-
-
-            //return await SignInManager.PasswordSignInAsync(user, userDto.Password, userDto.RememberMe, false);
-
-            var result = await SignInManager.PasswordSignInAsync(user, userDto.Password, userDto.RememberMe, false);
-
-            if (result.Succeeded)
+            try
             {
-                return new UserDTO
+                var user = await UserManager.FindByEmailAsync(userDto.Email);
+
+                if (user == null)
                 {
-                    FirstName = user.FirstName,
-                    SecondName = user.SecondName,
-                    NickName = user.NickName,
-                    DateOfBirth = user.DateOfBirth,
-                    Country = user.Country,
-                    Education = user.Education,
-                    Token = jwtGenerator.CreateToken(user),
-                    Image = user.Image
-                };
+                    throw new ValidationExceptions("Cannot find such a user", "");
+                    //return userDto;                
+                }
+
+                var result = await SignInManager.PasswordSignInAsync(user, userDto.Password, userDto.RememberMe, false);
+
+                if (result.Succeeded)
+                {
+                    return new UserDTO
+                    {
+                        FirstName = user.FirstName,
+                        SecondName = user.SecondName,
+                        NickName = user.NickName,
+                        DateOfBirth = user.DateOfBirth,
+                        Country = user.Country,
+                        Education = user.Education,
+                        Token = jwtGenerator.CreateToken(user),
+                        Image = user.Image
+                    };
+                }
+                else
+                {
+                    throw new ValidationExceptions("", "");
+                }
+            }
+            catch
+            {
+                throw new ValidationExceptions("Password or Email is incorrect", "");
             }
 
-            throw new Exception();
+            //return userDto;
         }
 
         public async Task<IdentityResult> AddUserAsync(UserDTO userDto, bool isPersistent)
@@ -131,6 +146,32 @@ namespace Skillap.BLL.Service
         public async Task SignOut()
         {
             await SignInManager.SignOutAsync();
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(UserDTO userDto, string currentPassword, string newPassword)
+        {
+            try
+            {
+                var user = await UserManager.FindByEmailAsync(userDto.Email);
+
+                if (user == null)
+                {
+                    throw new ValidationExceptions("Cannot find such a user", "");
+                }
+
+                var res = await UserManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+                if (!res.Succeeded)
+                {
+                    return res;
+                }
+
+                return res;
+            }
+            catch
+            {
+                throw new ValidationExceptions("Something goes wrong while updating", "");
+            }
         }
 
         public async Task<UserDTO> GetUserAsync(string email)
