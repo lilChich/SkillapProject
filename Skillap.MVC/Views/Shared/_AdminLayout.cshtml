@@ -2,44 +2,9 @@
 @inject IAuthorizationService authService
 
 @{
-    ViewData["Title"] = "My Account";
+    ViewData["Title"] = "MyAccount";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-@*<div class="container">
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="menu position-absolute">
-                    @if (User.IsInRole("Teacher"))
-                    {
-                        <p class="menu-label">Menu</p>
-                        <ul class="menu-list">
-                            <li><a asp-controller="Account" asp-action="EditProfile">Edit Profile</a></li>
-                            <li><a asp-page="/Account/MySubjects">My Subjects</a></li>
-                            <li><a asp-page="/Account/MyMarks">My Marks</a></li>
-                            <li><a asp-page="/Account/Schedule">My Schedule</a></li>
-                        </ul>
-                    }
-
-                    @if (User.IsInRole("Student"))
-                    {
-                        <p class="menu-label">Menu</p>
-                        <ul class="menu-list">
-                            <li><a asp-page="/Admin/ConfigureStudents">Configure Students</a></li>
-                            <li><a asp-page="/Admin/ConfigureTeachers">Configure Teachers</a></li>
-                        </ul>
-                    }
-                    <p class="menu-label"></p>
-                    <ul class="menu-list">
-                        <li><a asp-page="/Index">Back to Main</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-9">
-                @RenderBody()
-            </div>
-        </div>
-    </div>*@
 
 <div class="row pb-5">
     <div class="col-md-12">
@@ -49,17 +14,16 @@
 
                     @if (User.IsInRole("Admin"))
                     {
-
-                        <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="MyAccount">Edit Profile</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="ManageUsers">Manage Users</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="ManageMasterClasses">Manage MasterClasses</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="Masters">Choose Masters</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="ManageMasters">Manage Masters</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="Tag">Create Tag</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="ManageTags">Manage Tags</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="Post">Create Post</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Logic" asp-action="ManagePosts">Manage Posts</a></li>
-
+       
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="ManageUsers">Users</a></li>
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="ManagePosts">Posts</a></li>
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="ManageMasterClasses">MasterClasses</a></li>
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="ManageMasters">Masters</a></li>
+                        
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="ManageTags">Tags</a></li>
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="Masters">Choose Masters</a></li>
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="Post">Create Post</a></li>
+                        <li class="nav-item"><a id="main_text_authorization" class="nav-link" asp-controller="Logic" asp-action="Tag">Create Tag</a></li>
                     }
 
                 </ul>

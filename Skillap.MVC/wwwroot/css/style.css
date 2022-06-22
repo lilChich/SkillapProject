@@ -2,6 +2,16 @@
     font-family: 'Luckiest Guy', cursive;
 }
 
+#profileImage {
+    box-shadow: rgba(125, 0, 166, 0.4) -5px 5px, rgba(125, 0, 166, 0.3) -10px 10px, rgba(125, 0, 166, 0.2) -15px 15px, rgba(125, 0, 166, 0.1) -20px 20px, rgba(125, 0, 166, 0.05) -25px 25px;
+}
+
+#nickName {
+    font-size: 30px;
+    font-weight: 500;
+    font-family: 'Mulish', sans-serif;
+}
+
 #main_text_authorization {
     font-family: 'Acme', sans-serif;
     font-weight: 500;
@@ -50,6 +60,39 @@
     text-decoration: none;
     font-family: 'Pacifico', cursive;
     font-size: 18px;
+}
+
+#buttonsProfile {
+    text-decoration: none;
+    background-color: #0275d8;
+    color: white;
+    font-family: 'Pacifico', cursive;
+    padding-right: 35px;
+    padding-left: 35px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    display: inline-block;
+    border-radius: 10px;
+    box-shadow: 0px 5px 30px 0px rgba(31,35,37,0.5);
+    transition: all 0.2s ease-in;
+    cursor: pointer;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+#buttonsProfile:hover {
+    background-color: #2302c9;
+    text-decoration: none;
+}
+
+#buttonsProfile:active, button:focus {
+    outline: none !important;
+}
+
+#buttonsProfile::-moz-focus-inner {
+    border: 0 !important;
 }
 
 #buttons {

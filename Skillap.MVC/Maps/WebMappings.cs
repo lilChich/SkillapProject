@@ -13,6 +13,7 @@ namespace Skillap.MVC.Maps
         public WebMappings() 
         {
             CreateMap<UserDTO, UserViewModel>();
+            CreateMap<UserDTO, EditUserViewModel>();
         }
     }
 }

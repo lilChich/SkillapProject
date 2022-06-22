@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Skillap.BLL.DTO;
+using Skillap.BLL.Exceptions;
 using Skillap.BLL.Interfaces.IServices;
 using Skillap.BLL.Interfaces.JWT;
 using Skillap.DAL.EF;
@@ -157,10 +158,15 @@ namespace Skillap.MVC.Controllers
             return View("Error");
         }
 
-        [HttpPost]
+        [HttpPost("Account/Login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel)
         {
+            if (loginViewModel.ExternalLogins == null)
+            {
+                loginViewModel.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                
+            }      
 
             if (loginViewModel.Email == null || loginViewModel.Password == null)
             {
@@ -179,14 +185,20 @@ namespace Skillap.MVC.Controllers
                 RememberMe = loginViewModel.RememberMe
             };
 
-            var res = await userService.Login(user);
-
-            if (res.Token != null)
+            try
             {
-                return RedirectToAction("Index", "Home");
+                var res = await userService.Login(user);
+                if (res.Token != null)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
-
-            ModelState.AddModelError("", "Incorrect data");
+            catch (ValidationExceptions ex)
+            {
+                ModelState.AddModelError(ex.Property, ex.Message);
+            }
+            
+            //ModelState.AddModelError("", "Incorrect data");
 
             return View(loginViewModel);
         }
@@ -258,7 +270,36 @@ namespace Skillap.MVC.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> MyAccount()
+        public async Task<IActionResult> EditProfile()
+        {
+            var user = await userService.GetUserAsync(this.User.Identity.Name);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"User with such Id cannot be found";
+                return View("");
+            }
+
+            var model = new EditUserViewModel()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                SecondName = user.SecondName,
+                Email = user.Email,
+                Gender = user.Gender,
+                Country = user.Country,
+                Education = user.Education,
+                DayOfBirth = user.DateOfBirth,
+                ExistingPhotoPath = user.Image,
+                NickName = user.NickName
+            };
+
+            return View(model);
+        }
+
+        [HttpGet, Route("MyProfile")]
+        [Authorize]
+        public async Task<IActionResult> MyProfile()
         {
             var user = await userService.GetUserAsync(this.User.Identity.Name);
 
@@ -274,6 +315,7 @@ namespace Skillap.MVC.Controllers
                 FirstName = user.FirstName,
                 SecondName = user.SecondName,
                 Email = user.Email,
+                Gender = user.Gender,
                 Country = user.Country,
                 Education = user.Education,
                 DayOfBirth = user.DateOfBirth,
@@ -282,14 +324,18 @@ namespace Skillap.MVC.Controllers
             };
 
             return View(model);
+            //return Ok(model);
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> MyAccount(EditUserViewModel model)
+        public async Task<IActionResult> EditProfile(EditUserViewModel model)
         {
             if (User.IsInRole("User"))
             {
+                var user = await userService.GetUserAsync(this.User.Identity.Name);
+                
+                string userImage = null;
                 string uniqueFileName = null;
 
                 if (model.Image != null)
@@ -298,6 +344,10 @@ namespace Skillap.MVC.Controllers
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     model.Image.CopyTo(new FileStream(filePath, FileMode.Create));
+                }
+                else
+                {
+                    userImage = user.Image;
                 }
 
                 var userDto = new UserDTO()
@@ -311,7 +361,7 @@ namespace Skillap.MVC.Controllers
                     Country = model.Country,
                     DateOfBirth = model.DayOfBirth,
                     Role = "User",
-                    Image = uniqueFileName,
+                    Image = uniqueFileName ?? userImage,
                     NickName = model.NickName
                 };
 
@@ -325,6 +375,40 @@ namespace Skillap.MVC.Controllers
 
             ModelState.AddModelError("", "Something goes wrong while updating");
 
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            else if (model.NewPassword != model.ConfirmNewPassword)
+            {
+                ModelState.AddModelError("", "Passwords must be the same");
+            }
+            else
+            {
+                var user = await userService.GetUserAsync(this.User.Identity.Name);
+
+                var res = await userService.ChangePasswordAsync(user, model.CurrentPassword, model.ConfirmNewPassword);
+
+                if (res.Succeeded)
+                {
+                    await userService.SignOut();
+                    return RedirectToAction("Login", "Account");
+                }
+            }
             return View(model);
         }
 

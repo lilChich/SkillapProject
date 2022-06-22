@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using AutoMapper;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
 
 namespace Skillap.MVC
 {
@@ -43,8 +44,14 @@ namespace Skillap.MVC
             services.AddAutoMapper(Assembly.Load("Skillap.MVC"), Assembly.Load("Skillap.DAL"));
             services.AddAutoMapper(Assembly.Load("Skillap.BLL"), Assembly.Load("Skillap.DAL"));
 
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            /*services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
+            services.AddMvc();*/
+            services.AddControllers();
+            services.AddSwaggerGen(i =>
+            {
+                i.SwaggerDoc("v1", new OpenApiInfo { Title = "Skillap", Version = "v1" });
+            });
 
 
             services.AddDbContext<DataContext>(options =>
@@ -126,6 +133,8 @@ namespace Skillap.MVC
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
+                app.UseSwagger();
+                app.UseSwaggerUI(i => i.SwaggerEndpoint("/swagger/v1/swagger.json", "Skillap v1"));
             }
             else
             {

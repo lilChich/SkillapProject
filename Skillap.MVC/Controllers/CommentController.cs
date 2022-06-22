@@ -82,7 +82,6 @@ namespace Skillap.MVC.Controllers
         }
 
         [Authorize]
-        
         public async Task<IActionResult> DeleteComment(int id)
         {
             var comment = await UoW.Comments.GetByIdAsync(id);

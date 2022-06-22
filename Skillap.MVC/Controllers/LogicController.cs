@@ -238,7 +238,7 @@ namespace Skillap.MVC.Controllers
             var model = new EditMasterViewModel
             {
                 UserId = master.ApplicationUserId,
-                MasterClassId = master.Id,
+                MasterClassId = master.MasterClassId,
                 Status = master.Status,
                 SkillLevel = master.SkillLevel
 

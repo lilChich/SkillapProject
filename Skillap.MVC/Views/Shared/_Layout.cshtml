@@ -94,17 +94,17 @@
                         {
                             @if (User.IsInRole("Admin"))
                             {
-                                <li class="nav-item">
+                                @*<li class="nav-item">
                                     <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="EditProfile">Admin</a>
-                                </li>
+                                </li>*@
                                 <li class="nav-item">
-                                    <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Logic" asp-action="MasterClasses">Admin</a>
+                                    <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Logic" asp-action="ManageUsers">Admin</a>
                                 </li>
 
 
                             }
                             <li class="nav-item">
-                                <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="MyAccount"><img id="user_image" class="" src="@currentImage" asp-append-version="true" /> Account</a>
+                                <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="MyProfile"><img id="user_image" class="" src="@currentImage" asp-append-version="true" />Account</a>
 
                             </li>
 
