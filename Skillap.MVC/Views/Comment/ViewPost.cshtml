@@ -1,10 +1,20 @@
 ﻿@using Skillap.BLL.DTO;
 @using Skillap.DAL.Entities;
-@using Skillap.MVC.ViewModels
+@using Skillap.MVC.ViewModels;
+@using Skillap.DAL.Interfaces 
+@using Skillap.BLL.Interfaces.IServices;
+@using Skillap.DAL.EF; 
+@inject IAuthService userService;
+@inject IUnitOfWork uow; 
+@inject DataContext db;
 @model Posts;
-@*
-   
-*@
+@{
+    int? sum = 0;
+    var user = await userService.GetUserAsync(this.User.Identity.Name);
+
+    //sum = Model.PostsLiked.Where(pl => pl.PostId == Model.Id && pl.UserId == user.Id).Select(t => t.Score).Sum();
+    sum = db.LikedPosts.Where(pl => pl.PostId == Model.Id).Sum(t => t.Score);
+}
 
 
 <div class="container">
@@ -14,29 +24,23 @@
             <span>@Model.Description</span>
             <span>@Model.CreatedTime</span>
 
-            @foreach (var pl in Model.PostsLiked.Where(i => i.PostId == Model.Id))
-            {
-                <div>
-                    <p>
-                        @Html.ActionLink("Like","Like","Logic", new { id = Model.Id })
-                    </p>
-                    <p>
-                        @if (pl.Score == null)
-                        {
-                            <p>0 --- Likes</p>
-                        }
-                        else
-                        {
-                            <p>@pl.Score --- Likes</p>
-                        }
-                    </p>
-                </div>
-                
-            }
-        </div>
-       
+            <div>
+                <p>
+                    @Html.ActionLink("Like", "Like", "Logic", new { id = Model.Id })
+                </p>
+                <p>
+                    @Html.ActionLink("Dislike", "Dislike", "Logic", new { id = Model.Id })
+                </p>
 
-       
+
+                <p>@sum --- Score</p>
+
+
+            </div>
+        </div>
+
+
+
     </div>
     <div class="row">
         <div class="col">
@@ -57,6 +61,6 @@
 
         </div>
     </div>
-    
+
 
 </div>

@@ -32,13 +32,16 @@ namespace Skillap.MVC.Controllers
         }
         
         [HttpGet]
-        public IActionResult ViewPost(int id)
+        public async Task<IActionResult> ViewPost(int id)
         {
-            var post = db.Posts.FirstOrDefault(x => x.Id == id);
-            var likedPost = db.LikedPosts.Where(x => x.PostId == id).ToList();
+            var user = await userService.GetUserAsync(this.User.Identity.Name);
+            var post = await db.Posts.FindAsync(id);
+            var likedPost = await UoW.LikedPosts.FindAsync(x => x.PostId == post.Id);
+            //var likedPost = db.LikedPosts.Where(x => x.PostId == post.Id).ToList();
             post.PostsLiked = new List<Liked_Posts>(likedPost);
 
-            var comments = db.Comments.Where(c => c.PostId == post.Id).ToList();
+            var comments = await UoW.Comments.FindAsync(c => c.PostId == post.Id);
+            //var comments = db.Comments.Where(c => c.PostId == post.Id).ToList();
             post.Comments = new List<Comments>(comments);
             
 
@@ -73,6 +76,7 @@ namespace Skillap.MVC.Controllers
                 await UoW.Posts.UpdateAsync(post);
             }
 
+            var user = userService.GetUserAsync(this.User.Identity.Name);
             var allCommentsOnPost = db.Comments.Where(c => c.PostId == post.Id).ToList();
             post.Comments = new List<Comments>(allCommentsOnPost);
             var likedPost = db.LikedPosts.Where(x => x.PostId == post.Id).ToList();

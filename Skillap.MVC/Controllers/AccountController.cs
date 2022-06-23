@@ -54,7 +54,7 @@ namespace Skillap.MVC.Controllers
             this.signInManager = signInManager;
         }
 
-        [HttpGet]
+        [HttpGet, Route("Login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
         {
@@ -64,10 +64,11 @@ namespace Skillap.MVC.Controllers
                 ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
             };
 
+            //return Ok(model);
             return View(model);
         }
 
-        [HttpPost]
+        [HttpPost, Route("ExternalLogin")]
         [AllowAnonymous]
         public IActionResult ExternalLogin(string returnUrl, string provider)
         {
@@ -158,7 +159,7 @@ namespace Skillap.MVC.Controllers
             return View("Error");
         }
 
-        [HttpPost("Account/Login")]
+        [HttpPost, Route("Login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel)
         {
@@ -197,20 +198,22 @@ namespace Skillap.MVC.Controllers
             {
                 ModelState.AddModelError(ex.Property, ex.Message);
             }
-            
+
             //ModelState.AddModelError("", "Incorrect data");
 
+            //return Ok(loginViewModel);
             return View(loginViewModel);
         }
 
-        [HttpGet]
+        [HttpGet, Route("Register")]
         [AllowAnonymous]
         public IActionResult Register()
         {
+            //return Ok();
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, Route("Register")]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (!new EmailAddressAttribute().IsValid(registerViewModel.Email))
@@ -265,10 +268,11 @@ namespace Skillap.MVC.Controllers
                 return RedirectToAction("Index", "Home", registerViewModel);
             }
 
+            //return Ok(registerViewModel);
             return View(registerViewModel);
         }
 
-        [HttpGet]
+        [HttpGet, Route("EditProfile")]
         [Authorize]
         public async Task<IActionResult> EditProfile()
         {
@@ -294,7 +298,8 @@ namespace Skillap.MVC.Controllers
                 NickName = user.NickName
             };
 
-            return View(model);
+            return Ok(model);
+            //return View(model);
         }
 
         [HttpGet, Route("MyProfile")]
@@ -323,11 +328,11 @@ namespace Skillap.MVC.Controllers
                 NickName = user.NickName
             };
 
-            return View(model);
-            //return Ok(model);
+            //return View(model);
+            return Ok(model);
         }
 
-        [HttpPost]
+        [HttpPost, Route("EditProfile")]
         [Authorize]
         public async Task<IActionResult> EditProfile(EditUserViewModel model)
         {
@@ -369,13 +374,15 @@ namespace Skillap.MVC.Controllers
 
                 if (updateUser)
                 {
-                    return RedirectToAction("Index","Home");
+                    return Ok(model);
+                    //return RedirectToAction("Index","Home");
                 }
             }
 
             ModelState.AddModelError("", "Something goes wrong while updating");
 
-            return View(model);
+            return Ok(model);
+            //return View(model);
         }
 
         [HttpGet]
@@ -385,7 +392,7 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, Route("ChangePassword")]
         [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -406,12 +413,16 @@ namespace Skillap.MVC.Controllers
                 if (res.Succeeded)
                 {
                     await userService.SignOut();
-                    return RedirectToAction("Login", "Account");
+                    return Ok(model);
+                    //return RedirectToAction("Login", "Account");
                 }
             }
-            return View(model);
+
+            return Ok(model);
+            //return View(model);
         }
 
+        
         [Authorize]
         public async Task<IActionResult> Logout()
         {

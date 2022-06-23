@@ -702,72 +702,249 @@ namespace Skillap.MVC.Controllers
         {
             var user = await secondUserService.GetUserAsync(this.User.Identity.Name);
             var post = await secondUserService.GetPostById(id);
-            var postToLike = db.LikedPosts.Where(l => l.PostId == id).FirstOrDefault();
 
-            try
+            var postToLike = db.LikedPosts.Where(l => l.PostId == id && l.UserId == user.Id).FirstOrDefault();
+            //var likedPost = new Liked_PostsDTO();
+            
+
+            if (postToLike == null)
             {
-                if (postToLike.Like == null)
+                var likedPost = new Liked_PostsDTO()
                 {
-                    var like = postToLike.Like = true;
+                    PostId = post.Id,
+                    UserId = user.Id,
+                    Like = null,
+                    Score = 0,
+                };
 
-                    if (like == true)
+                var mappedLikedPost = mapper.Map<Liked_Posts>(likedPost);
+
+                try
+                {
+                    await UoW.LikedPosts.CreateAsync(mappedLikedPost);
+
+                    if (mappedLikedPost.Like == null)
                     {
-                        postToLike.Score += 1;
-                        await UoW.LikedPosts.UpdateAsync(postToLike);
+                        var like = mappedLikedPost.Like = true;
+
+                        if (like == true)
+                        {
+                            mappedLikedPost.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedLikedPost);
+                        }
                     }
+                    /*else if (mappedLikedPost.Like == true)
+                    {
+                        var dislike = mappedLikedPost.Like = false;
+
+                        if (dislike == false)
+                        {
+                            mappedLikedPost.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedLikedPost);
+                        }
+                    }
+                    else
+                    {
+                        var like = mappedLikedPost.Like = true;
+
+                        if (like == true)
+                        {
+                            mappedLikedPost.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedLikedPost);
+                        }
+                    }*/
                 }
-                else if (postToLike.Like == true)
+                catch
                 {
-                    var dislike = postToLike.Like = false;
-
-                    if (dislike == false)
-                    {
-                        postToLike.Score -= 1;
-                        await UoW.LikedPosts.UpdateAsync(postToLike);
-                    }
-                }
-                else
-                {
-                    var like = postToLike.Like = true;
-
-                    if (like == true)
-                    {
-                        postToLike.Score += 1;
-                        await UoW.LikedPosts.UpdateAsync(postToLike);
-                    }
+                    throw new Exception("Something went wrong");
                 }
             }
-            catch
+            else
             {
-                throw new Exception("Cannot like post");
-            }
+                try
+                {
+                    if (postToLike.Like == null)
+                    {
+                        var like = postToLike.Like = true;
 
+                        if (like == true)
+                        {
+                            postToLike.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(postToLike);
+                        }
+                    }
+                    else if (postToLike.Like == true && postToLike.Score == 1)
+                    {
+                        var dislike = postToLike.Like = false;
+
+                        if (dislike == false)
+                        {
+                            postToLike.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(postToLike);
+                        }
+                    }
+                    else if (postToLike.Like == false && postToLike.Score == 0)
+                    {
+                        var like = postToLike.Like = true;
+
+                        if (like == true)
+                        {
+                            postToLike.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(postToLike);
+                        }
+                    }
+                    else if (postToLike.Like == true && postToLike.Score == 0)
+                    {
+                        var like = postToLike.Like = true;
+
+                        if (like == true)
+                        {
+                            postToLike.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(postToLike);
+                        }
+                    }
+                    else if (postToLike.Like == false && postToLike.Score == -1)
+                    {
+                        var like = postToLike.Like = true;
+
+                        if (like == true)
+                        {
+                            postToLike.Score += 2;
+                            await UoW.LikedPosts.UpdateAsync(postToLike);
+                        }
+                    }
+                }
+                catch
+                {
+                    throw new Exception();
+                }
+            }
             return RedirectToAction("ViewPost","Comment", new { id = id });
         }
 
         [Authorize]
         public async Task<IActionResult> Dislike(int id)
         {
-            // var post = secondUserService.GetPostById(id);
-            var likedPost = db.LikedPosts.Where(l => l.PostId == id).FirstOrDefault();
+            var user = await secondUserService.GetUserAsync(this.User.Identity.Name);
+            var post = await secondUserService.GetPostById(id);
 
-            try
+            var postToDislike = db.LikedPosts.Where(l => l.PostId == id && l.UserId == user.Id).FirstOrDefault();
+
+            if (postToDislike == null)
             {
-                var like = likedPost.Like = false;
-
-                if (like == false)
+                var dislikedPost = new Liked_PostsDTO()
                 {
-                    likedPost.Score -= 1;
+                    PostId = post.Id,
+                    UserId = user.Id,
+                    Like = null,
+                    Score = 0,
+                };
 
-                    await UoW.LikedPosts.UpdateAsync(likedPost);
+                var mappedDislikedPost = mapper.Map<Liked_Posts>(dislikedPost);
+
+                try
+                {
+                    await UoW.LikedPosts.CreateAsync(mappedDislikedPost);
+
+                    if (mappedDislikedPost.Like == null)
+                    {
+                        var dislike = mappedDislikedPost.Like = false;
+
+                        if (dislike == false)
+                        {
+                            mappedDislikedPost.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedDislikedPost);
+                        }
+                    }
+                    /*else if (mappedDislikedPost.Like == false)
+                    {
+                        var dislike = mappedDislikedPost.Like = true;
+
+                        if (dislike == true)
+                        {
+                            mappedDislikedPost.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedDislikedPost);
+                        }
+                    }
+                    else
+                    {
+                        var like = mappedDislikedPost.Like = false;
+
+                        if (like == false)
+                        {
+                            mappedDislikedPost.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedDislikedPost);
+                        }
+                    }*/
+                }
+                catch
+                {
+                    throw new Exception("Something went wrong");
                 }
             }
-            catch
+            else
             {
-                throw new Exception("Cannot dislike post");
+                try
+                {
+                    if (postToDislike.Like == null)
+                    {
+                        var dislike = postToDislike.Like = false;
+
+                        if (dislike == false)
+                        {
+                            postToDislike.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(postToDislike);
+                        }
+                    }
+                    else if (postToDislike.Like == false && postToDislike.Score == 0)
+                    {
+                        var dislike = postToDislike.Like = false;
+
+                        if (dislike == false)
+                        {
+                            postToDislike.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(postToDislike);
+                        }
+                    }
+                    else if (postToDislike.Like == true && postToDislike.Score == 0)
+                    {
+                        var dislike = postToDislike.Like = false;
+
+                        if (dislike == false)
+                        {
+                            postToDislike.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(postToDislike);
+                        }
+                    }
+                    else if (postToDislike.Like == false && postToDislike.Score == -1)
+                    {
+                        var like = postToDislike.Like = true;
+
+                        if (like == true)
+                        {
+                            postToDislike.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(postToDislike);
+                        }
+                    }
+                    else if (postToDislike.Like == true && postToDislike.Score == 1)
+                    {
+                        var dislike = postToDislike.Like = false;
+
+                        if (dislike == false)
+                        {
+                            postToDislike.Score -= 2;
+                            
+                            await UoW.LikedPosts.UpdateAsync(postToDislike);
+                        }
+                    }
+                }
+                catch
+                {
+                    throw new Exception();
+                }
             }
 
-            return RedirectToAction("ViewPost", "Comment", id);
+            return RedirectToAction("ViewPost", "Comment", new { id = id });
         }
 
         [Authorize]
