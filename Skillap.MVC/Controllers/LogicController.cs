@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Skillap.MVC.Controllers
@@ -48,73 +49,117 @@ namespace Skillap.MVC.Controllers
 
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult ManageMasterClasses()
+        //[Authorize]
+        [HttpGet, Route("ManageMasterClasses")]
+        public async Task<IActionResult> ManageMasterClasses()
         {
-            var masterClasses = userService.GetAllMasterClassesAsync();
-            return View(masterClasses);
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
+            var masterClasses = await UoW.MasterClasses.FindAsync(x => true);
+            return Ok(masterClasses);
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult ManageUsers()
+        //[Authorize]
+        [HttpGet, Route("ManageUsers")]
+        public async Task<IActionResult> ManageUsers()
         {
-            var users = secondUserService.GetAllUsersAsync();
-            return View(users);
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
+            var users = await UoW.ApplicationUsers.FindAsync(x => true);
+            //var users = secondUserService.GetAllUsersAsync();
+            return Ok(users);
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult ManageMasters()
+        //[Authorize]
+        [HttpGet, Route("ManageMasters")]
+        public async Task<IActionResult> ManageMasters()
         {
-            var masters = userService.GetAllMastersAsync();
-            return View(masters);
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
+            var masters = await UoW.Masters.FindAsync(x => true);
+            return Ok(masters);
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult ManageTags()
+        //[Authorize]
+        [HttpGet, Route("ManageTags")]
+        public async Task<IActionResult> ManageTags()
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             var tags = secondUserService.GetAllTags();
-            return View(tags);
+            //var tags = await UoW.Tags.FindAsync(x => true);
+            return Ok(tags);
         }
 
-        [Authorize]
-        [HttpGet]
+        //[Authorize]
+        [HttpGet, Route("ManagePosts")]
         public IActionResult ManagePosts()
         {
+            if (!this.User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            //var posts = await UoW.Posts.FindAsync(x => true);
             var posts = secondUserService.GetAllPosts();
-            return View(posts);
+            return Ok(posts);
+            //return Unauthorized();
         }
 
+        [HttpDelete, Route("DeleteUser")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await secondUserService.GetUserByIdAsync(id);
-
-            if (user == null)
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
             {
-                ViewBag.ErrorMassage = $"User with Id = {id} cannot be found";
-                return View("NotFound");
+                return Unauthorized();
             }
             else
             {
-                var res = secondUserService.DeleteUserAsync(user);
-                var users = secondUserService.GetAllUsersAsync();
+                var user = await secondUserService.GetUserByIdAsync(id);
 
-                if (res.IsCompleted)
+                if (user == null)
                 {
-
-                    return RedirectToAction("ManageUsers", users);
+                    ViewBag.ErrorMassage = $"User with Id = {id} cannot be found";
+                    return View("NotFound");
                 }
+                else
+                {
+                    var res = await secondUserService.DeleteUserAsync(user);
+                    //var users = secondUserService.GetAllUsersAsync();
 
-                return View("ManageUsers", users);
+                    if (res.Succeeded)
+                    {
+                        return Ok(res);
+                        //return RedirectToAction("ManageUsers", users);
+                    }
+
+                    return BadRequest("Can't delete user");
+                    //return View("ManageUsers", users);
+                }
             }
+           
         }
 
-        [HttpGet]
+        [HttpGet, Route("EditUsers")]
         public async Task<IActionResult> EditUsers(int id)
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             var user = await secondUserService.GetUserByIdAsync(id);
 
             if (user == null)
@@ -143,12 +188,18 @@ namespace Skillap.MVC.Controllers
 
             };
 
-            return View(model);
+            return Ok(model);
+            //return View(model);
         }
 
-        [HttpPost]
+        [HttpPost, Route("EditUsers")]
         public async Task<IActionResult> EditUsers(EditUserViewModel model)
         {
+            if (!this.User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
             if (ModelState.IsValid)
             {
                 var user = await secondUserService.GetUserByIdAsync(model.Id);
@@ -184,17 +235,17 @@ namespace Skillap.MVC.Controllers
                     user.Image = uniqueFileName;
                 }
 
-                var updateUser = UoW.ApplicationUsers.UpdateAsync(user);
+                await UoW.ApplicationUsers.UpdateAsync(user);
 
-                if (updateUser.IsCompleted)
-                {
-                    return RedirectToAction("ManageUsers", "Logic");
-                }
+                return Ok(user);
+                //return RedirectToAction("ManageUsers", "Logic");
+                
             }
 
             ModelState.AddModelError("", "Something goes wrong while updating");
 
-            return View(model);
+            return BadRequest("Something went wrong");
+            //return View(model);
         }
 
         [HttpGet]
@@ -248,15 +299,19 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        [HttpPost, Route("EditMaster")]
         public async Task<IActionResult> EditMaster(EditMasterViewModel model)
         {
-            var master = await userService.GetMasterByIdAsync(model.Id);
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
 
+            var master = await userService.GetMasterByIdAsync(model.Id);
 
             if (master == null)
             {
-                ViewBag.ErrorMassage = $"MasterClass with Id = {model.Id} cannot be found";
+                ViewBag.ErrorMassage = $"Master with Id = {model.Id} cannot be found";
                 return View("NotFound");
             }
             else
@@ -282,16 +337,23 @@ namespace Skillap.MVC.Controllers
                 if (res != null)
                 {
                     await res.Context.SaveChangesAsync();
-                    return RedirectToAction("ManageMasters");
+                    return Ok(model);
+                    //return RedirectToAction("ManageMasters");
                 }
 
-                return View(model);
+                return BadRequest();
+                //return View(model);
             }
         }
 
-        [HttpPost]
+        [HttpPost, Route("EditMasterClasses")]
         public async Task<IActionResult> EditMasterClasses(EditMasterClassViewModel model)
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             var masterClass = await userService.GetMasterClassById(model.Id);
             var currentMasterClass = mapper.Map<MasterClasses>(masterClass);
 
@@ -320,20 +382,36 @@ namespace Skillap.MVC.Controllers
 
                 //var result = await appUser.UpdateAsync(user);
 
-                var res = db.Set<MasterClasses>().Update(currentMasterClass);
+                //var res = db.Set<MasterClasses>().Update(currentMasterClass);
+                try
+                {
+                    await UoW.MasterClasses.UpdateAsync(currentMasterClass);
+                }
+                catch
+                {
+                    throw new Exception();
+                }
+                
 
-                if (res != null)
+                /*if (res != null)
                 {
                     await res.Context.SaveChangesAsync();
                     return RedirectToAction("ManageMasterClasses");
-                }
+                }*/
 
-                return View(model);
+                return Ok(currentMasterClass);
+                //return View(model);
             }
         }
 
+        [HttpDelete, Route("DeleteMasterClass")]
         public async Task<IActionResult> DeleteMasterClass(int id)
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             var masterClass = await userService.GetMasterClassById(id);
 
             if (masterClass == null)
@@ -349,13 +427,13 @@ namespace Skillap.MVC.Controllers
                 {
                     return RedirectToAction("ManageMasterClasses");
                 }
-                var masterClasses = userService.GetAllMasterClassesAsync();
-
-                return View("ManageMasterClasses", masterClasses);
+                //var masterClasses = userService.GetAllMasterClassesAsync();
+                return Ok();
+                //return View("ManageMasterClasses", masterClasses);
             }
         }
 
-
+        [HttpDelete, Route("DeleteMaster")]
         public async Task<IActionResult> DeleteMaster(int id)
         {
             var master = await userService.GetMasterByIdAsync(id);
@@ -370,7 +448,8 @@ namespace Skillap.MVC.Controllers
                 await UoW.Masters.DeleteAsync(master.Id);
                 await UoW.Masters.SaveAsync();
 
-                return RedirectToAction("ManageMasters");
+                return Ok();
+                //return RedirectToAction("ManageMasters");
             }
 
         }
@@ -421,8 +500,8 @@ namespace Skillap.MVC.Controllers
             return PartialView(sortedList);
         }
 
-        [Authorize]
-        [HttpPost]
+        //[Authorize]
+        [HttpPost, Route("Masters")]
         public async Task<ActionResult> Masters(MastersViewModel modelMasters)
         {
             var user = db.Users.Where(u => u.Id == modelMasters.SelectedUser).FirstOrDefault();
@@ -444,21 +523,20 @@ namespace Skillap.MVC.Controllers
                 };
 
                 await UoW.Masters.CreateAsync(masterDto);
+                return Ok(masterDto);
             }
             catch
             {
                 return View();
             }
+
+
+
+            //var masters = userService.GetAllMastersAsync();
             
-
-
-            var masters = userService.GetAllMastersAsync();
-
-            return View("ManageMasters", masters);
+            //return View("ManageMasters", masters);
         }
 
-
-        // GET: MainLogicController
         [Authorize]
         [HttpGet]
         public ActionResult MasterClasses()
@@ -466,10 +544,15 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [Authorize]
-        [HttpPost]
+        //[Authorize]
+        [HttpPost, Route("MasterClasses")]
         public async Task<ActionResult> MasterClasses(MasterClassViewModel model)
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             if (model.Name == null || model.Description == null || model.Category == null)
             {
                 ModelState.AddModelError("", "These fields must be filled");
@@ -508,9 +591,9 @@ namespace Skillap.MVC.Controllers
                 throw new Exception();
             }
 
-            var allMasterClasses = userService.GetAllMasterClassesAsync();
-
-            return View("ManageMasterClasses", allMasterClasses);
+            //var allMasterClasses = userService.GetAllMasterClassesAsync();
+            return Ok(masterClass);
+            //return View("ManageMasterClasses", allMasterClasses);
         }
 
         [Authorize]
@@ -520,10 +603,14 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [Authorize]
-        [HttpPost]
+        [HttpPost, Route("Tag")]
         public async Task<ActionResult> Tag(TagViewModel model)
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             if (model.Name == null)
             {
                 ModelState.AddModelError("", "These fields must be filled");
@@ -556,9 +643,9 @@ namespace Skillap.MVC.Controllers
             {
                 throw new Exception("Something went wrong");
             }
-            var allTags = secondUserService.GetAllTags();
-
-            return View("ManageTags", allTags);
+            //var allTags = secondUserService.GetAllTags();
+            return Ok(tag);
+            //return View("ManageTags", allTags);
         }
 
         [Authorize]
@@ -583,12 +670,15 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        [Authorize]
-        [HttpPost]
+        [HttpPost, Route("EditTag")]
         public async Task<IActionResult> EditTag(EditTagViewModel model)
         {
-            var tag = await UoW.Tags.GetByIdAsync(model.Id);
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
 
+            var tag = await UoW.Tags.GetByIdAsync(model.Id);
 
             if (tag == null)
             {
@@ -599,21 +689,36 @@ namespace Skillap.MVC.Controllers
             {
                 tag.Name = model.Name;
 
-                var res = db.Set<Tags>().Update(tag);
+                //var res = db.Set<Tags>().Update(tag);
 
-                if (res != null)
+                try
+                {
+                    await UoW.Tags.UpdateAsync(tag);
+                    return Ok(model);
+                }
+                catch
+                {
+                    throw new Exception();
+                }
+                
+/*                if (res != null)
                 {
                     await res.Context.SaveChangesAsync();
                     return RedirectToAction("ManageTags");
-                }
+                }*/
 
-                return View(model);
+                //return View(model);
             }
         }
 
-        [Authorize]
+        [HttpDelete, Route("DeleteTag")]
         public async Task<IActionResult> DeleteTag(int id)
         {
+            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            {
+                return Unauthorized();
+            }
+
             var tag = await UoW.Tags.GetByIdAsync(id);
 
             if (tag == null)
@@ -625,7 +730,8 @@ namespace Skillap.MVC.Controllers
             {
                 await UoW.Tags.DeleteAsync(tag.Id);
 
-                return RedirectToAction("ManageTags");
+                return Ok();
+                //return RedirectToAction("ManageTags");
             }
 
         }
@@ -637,10 +743,15 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [Authorize]
-        [HttpPost]
+        //[Authorize]
+        [HttpPost, Route("Post")]
         public async Task<ActionResult> Post(PostViewModel model)
         {
+            if (!this.User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
             if (model.Name == null || model.Description == null)
             {
                 ModelState.AddModelError("", "These fields must be filled");
@@ -660,7 +771,7 @@ namespace Skillap.MVC.Controllers
                 return View(model);
             }
 
-            var post = new PostsDTO()
+            var post = new Posts()
             {
                 Name = model.Name,
                 Description = model.Description,
@@ -668,7 +779,57 @@ namespace Skillap.MVC.Controllers
                 Status = model.Status
             };
 
-            await secondUserService.CreatePostAsync(post);
+            await UoW.Posts.CreateAsync(post);
+
+            if (ModelState.IsValid)
+            {
+                string pattern = @"\B(\#[a-zA-Z0-9]+\b)(?!;)";
+
+                foreach (Match match in Regex.Matches(model.Tags, pattern))
+                {
+                    try
+                    {
+                        var tagToFind = db.Tags.Where(x => x.Name == match.Value).FirstOrDefault();
+
+                        if (tagToFind == null)
+                        {
+                            var tag = new Tags()
+                            {
+                                Name = match.Value
+                            };
+
+                            await UoW.Tags.CreateAsync(tag);
+                            var thisTag = db.Tags.Where(x => x.Name == tag.Name).FirstOrDefault();
+
+                            var post_Tags = new Post_Tags()
+                            {
+                                PostId = post.Id,
+                                TagId = thisTag.Id
+                            };
+
+                            await UoW.PostsTags.CreateAsync(post_Tags);
+                        }
+                        else
+                        {
+                            var post_Tags = new Post_Tags()
+                            {
+                                PostId = post.Id,
+                                TagId = tagToFind.Id
+                            };
+
+                            await UoW.PostsTags.CreateAsync(post_Tags);
+                        }
+                    }
+                    catch
+                    {
+                        throw new Exception();
+                    }
+                   
+                }
+            }
+
+            //await secondUserService.CreatePostAsync(post);
+
             var user = await secondUserService.GetUserAsync(this.User.Identity.Name);
             var findPost = db.Posts.Where(p => p.Name == post.Name && p.Description == post.Description).FirstOrDefault();
 
@@ -678,6 +839,7 @@ namespace Skillap.MVC.Controllers
                 UserId = user.Id,
                 Like = null,
                 Score = 0,
+                isCreator = true
             };
 
             var mappedLikedPost = mapper.Map<Liked_Posts>(likedPost);
@@ -692,23 +854,45 @@ namespace Skillap.MVC.Controllers
                 throw new Exception("Something went wrong");
             }
 
-            var allPosts = secondUserService.GetAllPosts();
-
-            return View("ManagePosts", allPosts);
+            return Ok(post);
+            //var allPosts = secondUserService.GetAllPosts();
+            //return View("ManagePosts", allPosts);
         }
 
-        [Authorize]
+        /*[Authorize]
         public async Task<IActionResult> Like(int id)
         {
             var user = await secondUserService.GetUserAsync(this.User.Identity.Name);
             var post = await secondUserService.GetPostById(id);
             var postToLike = db.LikedPosts.Where(l => l.PostId == id).FirstOrDefault();
 
-            try
-            {
-                if (postToLike.Like == null)
+                try
                 {
-                    var like = postToLike.Like = true;
+                    await UoW.LikedPosts.CreateAsync(mappedLikedPost);
+
+                    if (mappedLikedPost.Like == null)
+                    {
+                        var like = mappedLikedPost.Like = true;
+
+                        if (like == true)
+                        {
+                            mappedLikedPost.Score += 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedLikedPost);
+                        }
+                    }
+                }
+                catch
+                {
+                    throw new Exception("Something went wrong");
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (postToLike.Like == null)
+                    {
+                        var like = postToLike.Like = true;
 
                     if (like == true)
                     {
@@ -755,9 +939,29 @@ namespace Skillap.MVC.Controllers
             {
                 var like = likedPost.Like = false;
 
-                if (like == false)
+                    if (mappedDislikedPost.Like == null)
+                    {
+                        var dislike = mappedDislikedPost.Like = false;
+
+                        if (dislike == false)
+                        {
+                            mappedDislikedPost.Score -= 1;
+                            await UoW.LikedPosts.UpdateAsync(mappedDislikedPost);
+                        }
+                    }
+                }
+                catch
                 {
-                    likedPost.Score -= 1;
+                    throw new Exception("Something went wrong");
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (postToDislike.Like == null)
+                    {
+                        var dislike = postToDislike.Like = false;
 
                     await UoW.LikedPosts.UpdateAsync(likedPost);
                 }
@@ -767,8 +971,8 @@ namespace Skillap.MVC.Controllers
                 throw new Exception("Cannot dislike post");
             }
 
-            return RedirectToAction("ViewPost", "Comment", id);
-        }
+            return RedirectToAction("F", "Comment", new { id = id });
+        }*/
 
         [Authorize]
         [HttpGet]
@@ -793,7 +997,7 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        [Authorize]
+        /*[Authorize]
         [HttpPost]
         public async Task<IActionResult> EditPost(EditPostViewModel model)
         {
@@ -821,26 +1025,9 @@ namespace Skillap.MVC.Controllers
 
                 return View(model);
             }
-        }
+        }*/
 
-        [Authorize]
-        public async Task<IActionResult> DeletePost(int id)
-        {
-            var post = await UoW.Posts.GetByIdAsync(id);
-
-            if (post == null)
-            {
-                ViewBag.ErrorMassage = $"Post with Id = {id} cannot be found";
-                return View("NotFound");
-            }
-            else
-            {
-                await UoW.Posts.DeleteAsync(post.Id);
-
-                return RedirectToAction("ManagePosts");
-            }
-
-        }
+        
 
         [Authorize]
         [HttpGet]

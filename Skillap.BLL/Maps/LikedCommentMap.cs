@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Skillap.BLL.Maps
 {
-    public class LikedPostMap : Profile
+    public class LikedCommentMap : Profile
     {
-        public LikedPostMap()
+        public LikedCommentMap()
         {
-            CreateMap<Liked_Posts, Liked_PostsDTO>()
+            CreateMap<Liked_Comments, Liked_CommentsDTO>()
                 .ForMember(DTO => DTO.Id, opt => opt.MapFrom(DO => DO.Id))
                 .ForMember(DTO => DTO.Like, opt => opt.MapFrom(DO => DO.Like))
-                .ForMember(DTO => DTO.PostId, opt => opt.MapFrom(DO => DO.PostId))
+                .ForMember(DTO => DTO.CommentId, opt => opt.MapFrom(DO => DO.CommentId))
                 .ForMember(DTO => DTO.Score, opt => opt.MapFrom(DO => DO.Score))
                 .ForMember(DTO => DTO.UserId, opt => opt.MapFrom(DO => DO.UserId))
                 .ForMember(DTO => DTO.isCreator, opt => opt.MapFrom(DO => DO.isCreator))

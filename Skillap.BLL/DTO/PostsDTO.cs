@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Skillap.DAL.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,7 @@ namespace Skillap.BLL.DTO
         public string Description { get; set; }
         public DateTime CreatedTime { get; set; }
         public bool Status { get; set; }
+
+        //public IList<Post_Tags> PostTags { get; set; }
     }
 }

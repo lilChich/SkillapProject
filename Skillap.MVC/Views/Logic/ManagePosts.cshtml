@@ -1,58 +1,132 @@
-﻿@model IEnumerable<Skillap.BLL.DTO.PostsDTO>
+﻿@using Skillap.BLL.Models
+@using Skillap.BLL.DTO
+@model PostMenuModel
+@*@model IEnumerable<Skillap.BLL.DTO.PostsDTO>*@
 
 @{
     ViewData["Title"] = "ManageUsers";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-
+<form method="get">
+    <div class="row">
+        <div class="col-md-6">
+            <label for="name" class="form-label">Find by name: </label>
+            <input id="name" name="name" value="@Model.FilterViewModel.SelectedName" class="form-control" />
+        </div>
+    </div>
+    <div class="col-md-2">
+        <label style="opacity:0" for="button" class="form-label">Categories: </label>
+        <input id="button" type="submit" value="Filter" class="btn btn-outline-dark col" />
+    </div>
+</form>
 <table class="table">
-    <thead>
+    <tr>
+        <th>
+            <a asp-action="ManagePosts"
+               asp-route-sort="@(Model.SortViewModel.NameSort)"
+               asp-route-name="@(Model.FilterViewModel.SelectedName)">Name</a>
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            <a asp-action="ManagePosts" asp-route-sort="@(Model.SortViewModel.DateSort)"
+               asp-route-name="@(Model.FilterViewModel.SelectedName)">CreatedTime</a>
+        </th>
+        <th>
+            <a asp-action="ManagePosts" asp-route-sort="@(Model.SortViewModel.StatusSort)"
+               asp-route-name="@(Model.FilterViewModel.SelectedName)">Status</a>
+        </th>
+    </tr>
+    @foreach (PostsDTO p in Model.Posts)
+    {
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-        <tr>
+            <td> @p.Name</td>
+            <td> @p.Description</td>
+            <td> @p.CreatedTime</td>
+            <td> @p.Status</td>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <form asp-action="DeletePost" asp-route-id="@item.Id" method="post">
-                    <a asp-action="EditPost" asp-controller="Logic" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="ViewPost" asp-controller="Comment" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+                <form asp-action="DeletePost" asp-route-id="@p.Id" method="post">
+                    <a asp-action="EditPost" asp-controller="Logic" asp-route-id="@p.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="ViewPost" asp-controller="Comment" asp-route-id="@p.Id" class="btn btn-primary">View</a>
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>
         </tr>
-        }
-    </tbody>
+    }
+    @*<thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreatedTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        <form asp-action="DeletePost" asp-route-id="@item.Id" method="post">
+                            <a asp-action="EditPost" asp-controller="Logic" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                            <a asp-action="ViewPost" asp-controller="Comment" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>*@
 </table>
+<div class="row">
+    @if (Model.PageViewModel.HasPreviousPage)
+    {
+        <div class="col-md-2">
+            <a asp-action="ManagePosts"
+               asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+               asp-route-name="@(Model.FilterViewModel.SelectedName)"
+               asp-route-sort="@(Model.SortViewModel.Current)"
+               class="btn  btn-outline-dark col">
+                Back
+            </a>
+        </div>
+    }
+    @if (Model.PageViewModel.HasNextPage)
+    {
+        <div class="col-md-2">
+            <a asp-action="ManagePosts"
+               asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+               asp-route-name="@(Model.FilterViewModel.SelectedName)"
+               asp-route-sort="@(Model.SortViewModel.Current)"
+               class="btn btn-outline-dark col">
+                Next
+            </a>
+        </div>
+    }
+</div>

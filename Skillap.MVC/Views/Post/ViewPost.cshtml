@@ -1,0 +1,68 @@
+﻿@using Skillap.BLL.DTO;
+@using Skillap.DAL.Entities;
+@using Skillap.MVC.ViewModels;
+@using Skillap.DAL.Interfaces 
+@using Skillap.BLL.Interfaces.IServices;
+@using Skillap.DAL.EF; 
+@inject IAuthService userService;
+@inject IUnitOfWork uow; 
+@inject DataContext db;
+@model Posts;
+@{
+    int? sum = 0;
+    var user = await userService.GetUserAsync(this.User.Identity.Name);
+
+    //sum = Model.PostsLiked.Where(pl => pl.PostId == Model.Id && pl.UserId == user.Id).Select(t => t.Score).Sum();
+    sum = db.LikedPosts.Where(pl => pl.PostId == Model.Id).Sum(t => t.Score);
+    //sum = await uow.LikedPosts.FindAsync(pl => pl.PostId == Model.Id);
+
+    Layout = "~/Views/Shared/_PostLayout.cshtml";
+}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <span>@Model.Name</span>
+            <span>@Model.Description</span>
+            <span>@Model.CreatedTime</span>
+
+            <div>
+                <p>
+                    @Html.ActionLink("Like", "Like", "Post", new { id = Model.Id })
+                </p>
+                <p>
+                    @Html.ActionLink("Dislike", "Dislike", "Post", new { id = Model.Id })
+                </p>
+
+
+                <p>@sum --- Score</p>
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+    <div class="row">
+        <div class="col">
+            @*@Html.Raw(Model.Comments)*@
+            @{
+                @Html.RenderPartialAsync("MainCommentView", new CommentViewModel { PostId = Model.Id, Id = 0 })
+            }
+            @foreach (var c in Model.Comments)
+            {
+
+                <div id="#comment">
+                    <p>
+                        @c.Content --- @c.CreatedTime
+                    </p>
+                </div>
+
+            }
+
+        </div>
+    </div>
+
+</div>

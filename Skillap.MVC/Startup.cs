@@ -25,6 +25,7 @@ using AutoMapper;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
+using Skillap.BLL.Hubs;
 
 namespace Skillap.MVC
 {
@@ -47,7 +48,12 @@ namespace Skillap.MVC
             /*services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
             services.AddMvc();*/
-            services.AddControllers();
+            services.AddSignalR();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
+
             services.AddSwaggerGen(i =>
             {
                 i.SwaggerDoc("v1", new OpenApiInfo { Title = "Skillap", Version = "v1" });
@@ -133,8 +139,7 @@ namespace Skillap.MVC
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
-                app.UseSwagger();
-                app.UseSwaggerUI(i => i.SwaggerEndpoint("/swagger/v1/swagger.json", "Skillap v1"));
+                
             }
             else
             {
@@ -142,6 +147,9 @@ namespace Skillap.MVC
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseSwagger();
+            app.UseSwaggerUI(i => i.SwaggerEndpoint("/swagger/v1/swagger.json", "Skillap v1"));
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -163,6 +171,8 @@ namespace Skillap.MVC
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+
+                endpoints.MapHub<PostChatHub>("/postChatHub");
             });
         }
     }

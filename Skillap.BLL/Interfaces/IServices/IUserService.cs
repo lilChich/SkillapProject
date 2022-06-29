@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Skillap.BLL.DTO;
+using Skillap.BLL.Models;
 using Skillap.DAL.Entities;
 
 namespace Skillap.BLL.Interfaces.IServices
@@ -48,6 +49,6 @@ namespace Skillap.BLL.Interfaces.IServices
         public IEnumerable<TagsDTO> GetAllTags();
         public IEnumerable<PostsDTO> GetAllPosts();
 
-
+        public Task<PostMenuModel> LoadPostsAsync(string name, int page, SortType sort, int amountOfElementsOnPage);
     }
 }

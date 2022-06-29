@@ -4,6 +4,7 @@ using Skillap.BLL.DTO;
 using Skillap.BLL.Exceptions;
 using Skillap.BLL.Interfaces.IServices;
 using Skillap.BLL.Interfaces.JWT;
+using Skillap.BLL.Models;
 using Skillap.DAL.EF;
 using Skillap.DAL.Entities;
 using Skillap.DAL.Interfaces;
@@ -560,6 +561,40 @@ namespace Skillap.BLL.Service
             {
                 throw new Exception("Cannot create likedPost");
             }
+        }
+
+        public async Task<PostMenuModel> LoadPostsAsync(string name, int page, SortType sort, int amountOfElementsOnPage)
+        {
+            var posts = await UoW.Posts.FindAsync(x => true);
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                posts = posts.Where(x => x.Name.Contains(name));
+            }
+
+            posts = sort switch
+            {
+                SortType.NameDesc => posts.OrderByDescending(x => x.Name),
+                SortType.DateAsc => posts.OrderBy(x => x.CreatedTime),
+                SortType.DateDesc => posts.OrderByDescending(x => x.CreatedTime),
+                SortType.StatusAsc => posts.OrderBy(x => x.Status),
+                SortType.StatusDesc => posts.OrderByDescending(x => x.Status),
+                _ => posts.OrderBy(x => x.Name),
+            };
+            var count = posts.Count();
+            var items = posts.Skip((page - 1) * amountOfElementsOnPage).Take(amountOfElementsOnPage).ToList();
+
+            var mappedPosts = Mapper.Map<IEnumerable<PostsDTO>>(items);
+
+            PostMenuModel viewModel = new PostMenuModel()
+            {
+                PageViewModel = new PageViewModel(count, page, amountOfElementsOnPage),
+                SortViewModel = new SortViewModel(sort),
+                FilterViewModel = new FilterViewModel(name),
+                Posts = mappedPosts
+            };
+
+            return viewModel;
         }
     }
 }

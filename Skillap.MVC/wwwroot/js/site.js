@@ -1,22 +1,38 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿
 
-// Write your JavaScript code.
 
-/*window.addEventListener('DOMContentLoaded', event => {
+$(() => {
+    var connection = new signalR.HubConnectionBuilder().withUrl("/postChatHub").build();
+    //var url = new URL(this.)
+    //var id = url.searchParams.get("id");
+    var params = new URLSearchParams(location.search);
+    var data = { id: params.get('id') };
+   
+    connection.start();
+    connection.on("LoadComments", function () {
+        LoadProdData();
+    })
 
-    // Toggle the side navigation
-    const sidebarToggle = document.body.querySelector('#sidebarToggle');
-    if (sidebarToggle) {
-         //Uncomment Below to persist sidebar toggle between refreshes
-        if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-            document.body.classList.toggle('sb-sidenav-toggled');
-        }
-        sidebarToggle.addEventListener('click', event => {
-            event.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-            localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+    LoadProdData();
+
+    function LoadProdData() {
+        var div = '';
+
+        $.ajax({
+            url: '/ViewPost',
+            method: 'GET',
+            success: (result) => {
+                $.each(result, (v) => {
+                    div += `<div>
+                                <p>${v.Content} --- ${v.CreatedTime}</p>
+                            </div>`;
+                })
+
+                $("#comment").html(div);
+            },
+            error: () => {
+                console.log()
+            }
         });
     }
-
-});*/
+})

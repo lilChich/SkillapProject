@@ -96,14 +96,18 @@
                                     {
                                     <form asp-action="DeletePost" asp-route-id="@item.Id" method="post">
                                         <a asp-action="EditPost" asp-controller="Logic" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                                        <a asp-action="ViewPost" asp-controller="Comment" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+                                        <a asp-action="ViewPost" asp-controller="Post" asp-route-id="@item.Id" class="btn btn-primary">View</a>
                                         <button type="submit" class="btn btn-danger">Delete</button>
                                     </form>
                                     }
-                                    
-                                        <form  method="post">
-                                            <a asp-action="ViewPost" asp-controller="Comment" asp-route-id="@item.Id" class="btn btn-primary">View</a>
-                                        </form>
+                                    else
+                                    {
+                                    <form method="post">
+                                        <a asp-action="ViewPost" asp-controller="Post" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+                                    </form>
+                                    }
+
+                                        
 
 
                                 </td>

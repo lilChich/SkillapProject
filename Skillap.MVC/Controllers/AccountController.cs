@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+//using System.Data.Entity;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Skillap.MVC.Controllers
 {
@@ -54,7 +56,8 @@ namespace Skillap.MVC.Controllers
             this.signInManager = signInManager;
         }
 
-        [HttpGet]
+        //[HttpGet, Route("Login")]
+        [HttpGet, Route("Login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
         {
@@ -67,7 +70,7 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        [HttpPost]
+        //[HttpPost, Route("ExternalLogin")]
         [AllowAnonymous]
         public IActionResult ExternalLogin(string returnUrl, string provider)
         {
@@ -158,8 +161,8 @@ namespace Skillap.MVC.Controllers
             return View("Error");
         }
 
-        [HttpPost("Account/Login")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, Route("Login")]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel)
         {
             if (loginViewModel.ExternalLogins == null)
@@ -190,7 +193,8 @@ namespace Skillap.MVC.Controllers
                 var res = await userService.Login(user);
                 if (res.Token != null)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return Ok(res);
+                    //return RedirectToAction("Index", "Home");
                 }
             }
             catch (ValidationExceptions ex)
@@ -200,7 +204,8 @@ namespace Skillap.MVC.Controllers
             
             //ModelState.AddModelError("", "Incorrect data");
 
-            return View(loginViewModel);
+            return Ok(loginViewModel);
+            //return View(loginViewModel);
         }
 
         [HttpGet]
@@ -262,14 +267,15 @@ namespace Skillap.MVC.Controllers
 
             if (res.Succeeded)
             {
-                return RedirectToAction("Index", "Home", registerViewModel);
+                return Ok(registerViewModel);
+                //return RedirectToAction("Index", "Home", registerViewModel);
             }
 
             return View(registerViewModel);
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet, Route("EditProfile")]
+        //[Authorize]
         public async Task<IActionResult> EditProfile()
         {
             var user = await userService.GetUserAsync(this.User.Identity.Name);
@@ -279,26 +285,34 @@ namespace Skillap.MVC.Controllers
                 ViewBag.ErrorMessage = $"User with such Id cannot be found";
                 return View("");
             }
-
-            var model = new EditUserViewModel()
+            else if (this.User.Identity.IsAuthenticated)
             {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                SecondName = user.SecondName,
-                Email = user.Email,
-                Gender = user.Gender,
-                Country = user.Country,
-                Education = user.Education,
-                DayOfBirth = user.DateOfBirth,
-                ExistingPhotoPath = user.Image,
-                NickName = user.NickName
-            };
+                var model = new EditUserViewModel()
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    SecondName = user.SecondName,
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    Country = user.Country,
+                    Education = user.Education,
+                    DayOfBirth = user.DateOfBirth,
+                    ExistingPhotoPath = user.Image,
+                    NickName = user.NickName
+                };
 
-            return View(model);
+                return Ok(model);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+            
+            //return View(model);
         }
 
         [HttpGet, Route("MyProfile")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> MyProfile()
         {
             var user = await userService.GetUserAsync(this.User.Identity.Name);
@@ -308,22 +322,38 @@ namespace Skillap.MVC.Controllers
                 ViewBag.ErrorMessage = $"User with such Id cannot be found";
                 return View("");
             }
-
-            var model = new UserViewModel()
+            else if (this.User.Identity.IsAuthenticated)
             {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                SecondName = user.SecondName,
-                Email = user.Email,
-                Gender = user.Gender,
-                Country = user.Country,
-                Education = user.Education,
-                DayOfBirth = user.DateOfBirth,
-                Image = user.Image,
-                NickName = user.NickName
-            };
+                var model = new UserViewModel()
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    SecondName = user.SecondName,
+                    Email = user.Email,
+                    Gender = user.Gender,
+                    Country = user.Country,
+                    Education = user.Education,
+                    DayOfBirth = user.DateOfBirth,
+                    Image = user.Image,
+                    NickName = user.NickName,
+                    Role = await (from role in db.Roles
+                                  join userRole in db.UserRoles
+                                  on role.Id equals userRole.RoleId
+                                  join myuser in db.Users
+                                  on userRole.UserId equals myuser.Id
+                                  where user.Id == myuser.Id
+                                  select role).ToListAsync()
+                };
 
-            return View(model);
+                return Ok(model);
+                //return View(model);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+            
+            
             //return Ok(model);
         }
 
@@ -385,8 +415,8 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost, Route("ChangePassword")]
+        //[Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -397,7 +427,7 @@ namespace Skillap.MVC.Controllers
             {
                 ModelState.AddModelError("", "Passwords must be the same");
             }
-            else
+            else if (this.User.Identity.IsAuthenticated)
             {
                 var user = await userService.GetUserAsync(this.User.Identity.Name);
 
@@ -409,15 +439,24 @@ namespace Skillap.MVC.Controllers
                     return RedirectToAction("Login", "Account");
                 }
             }
-            return View(model);
+
+            return Unauthorized();
+            //return View(model);
         }
 
-        [Authorize]
+        [HttpPost, Route("Logout")]        
         public async Task<IActionResult> Logout()
-        {
-            await userService.SignOut();
-
-            return RedirectToAction("Index", "Home");
+        {        
+            if (!this.User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                await userService.SignOut();
+                return Ok();
+            }
+            //return RedirectToAction("Index", "Home");
         }
     }
 }

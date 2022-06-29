@@ -19,6 +19,7 @@ namespace Skillap.MVC.Maps
                 cfg.AddProfile(new TagMap());
                 cfg.AddProfile(new PostMap());
                 cfg.AddProfile(new LikedPostMap());
+                cfg.AddProfile(new LikedCommentMap());
             });
 
             return config;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Skillap.BLL.DTO;
+using Skillap.DAL.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,8 +13,8 @@ namespace Skillap.MVC.ViewModels
         [Required]
         [StringLength(50, MinimumLength = 5)]
         [Display(Name = "Name")]
-        [RegularExpression("^[a-zA-Zа-яА-Я]{5,50}$|^$",
-            ErrorMessage = "Name must contains from 5 to 50 characters")]
+        //[RegularExpression("^[a-zA-Zа-яА-Я]{5,50}$|^$",
+            //ErrorMessage = "Name must contains from 5 to 50 characters")]
         public string Name { get; set; }
         [Required]
         [StringLength(150, MinimumLength = 10)]
@@ -23,6 +25,11 @@ namespace Skillap.MVC.ViewModels
         public DateTime CreatedTime { get; set; }
         public bool Status { get; set; }
 
+        //[RegularExpression(@"\B(\#[a-zA-Z0-9]+\b)(?!;)")]
+        public string Tags { get; set; }
+
+
+        public List<Tags> allTags { get; set; }
         public List<MainCommentViewModel> MainComments { get; set; }
     }
 }

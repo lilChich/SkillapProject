@@ -11,6 +11,7 @@ namespace Skillap.DAL.Entities
         public int Id { get; set; }
         public int? Score { get; set; }
         public Nullable<bool> Like { get; set; }
+        public bool isCreator { get; set; }
 
         public int UserId { get; set; }
         public ApplicationUsers Users { get; set; }
