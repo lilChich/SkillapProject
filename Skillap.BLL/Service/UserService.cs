@@ -565,35 +565,34 @@ namespace Skillap.BLL.Service
 
         public async Task<PostMenuModel> LoadPostsAsync(string name, int page, SortType sort, int amountOfElementsOnPage)
         {
-            var posts = await UoW.Posts.FindAsync(x => true);
+            var posts = await UoW.Posts.FindAsync(i => true);
 
             if (!string.IsNullOrEmpty(name))
             {
-                posts = posts.Where(x => x.Name.Contains(name));
+                posts = posts.Where(i => i.Name.Contains(name));
             }
 
             posts = sort switch
             {
-                SortType.NameDesc => posts.OrderByDescending(x => x.Name),
-                SortType.DateAsc => posts.OrderBy(x => x.CreatedTime),
-                SortType.DateDesc => posts.OrderByDescending(x => x.CreatedTime),
-                SortType.StatusAsc => posts.OrderBy(x => x.Status),
-                SortType.StatusDesc => posts.OrderByDescending(x => x.Status),
-                _ => posts.OrderBy(x => x.Name),
+                SortType.NameDesc => posts.OrderByDescending(i => i.Name),
+                SortType.DateAsc => posts.OrderBy(i => i.CreatedTime),
+                SortType.DateDesc => posts.OrderByDescending(i => i.CreatedTime),
+                SortType.StatusAsc => posts.OrderBy(i => i.Status),
+                SortType.StatusDesc => posts.OrderByDescending(i => i.Status),
+                _ => posts.OrderBy(i => i.Name),
             };
             var count = posts.Count();
             var items = posts.Skip((page - 1) * amountOfElementsOnPage).Take(amountOfElementsOnPage).ToList();
 
-            var mappedPosts = Mapper.Map<IEnumerable<PostsDTO>>(items);
+            var mappedItems = Mapper.Map<IEnumerable<PostsDTO>>(items);
 
             PostMenuModel viewModel = new PostMenuModel()
             {
                 PageViewModel = new PageViewModel(count, page, amountOfElementsOnPage),
                 SortViewModel = new SortViewModel(sort),
                 FilterViewModel = new FilterViewModel(name),
-                Posts = mappedPosts
+                Posts = mappedItems
             };
-
             return viewModel;
         }
     }
