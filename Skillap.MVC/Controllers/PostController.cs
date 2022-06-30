@@ -44,7 +44,7 @@ namespace Skillap.MVC.Controllers
             this.postChatHub = postChatHub;
         }
         
-        [HttpGet, Route("ViewPost")]
+        [HttpGet, Route("Post/ViewPost")]
         [AllowAnonymous]
         public async Task<IActionResult> ViewPost(int id)
         {
@@ -72,11 +72,11 @@ namespace Skillap.MVC.Controllers
             //var comments = db.Comments.Where(c => c.PostId == post.Id).ToList();
             post.Comments = new List<Comments>(comments);
 
-            //return Ok(post);
-            return View(post);
+            return Ok(post);
+            //return View(post);
         }
 
-        [HttpPost, Route("ViewPost")]
+        [HttpPost, Route("Post/ViewPost")]
         public async Task<IActionResult> ViewPost(CommentViewModel vm)
         {
             if (!this.User.Identity.IsAuthenticated)
@@ -148,8 +148,8 @@ namespace Skillap.MVC.Controllers
             post.PostTags = new List<Post_Tags>(postTags);
             await postChatHub.Clients.All.SendAsync("LoadComments");
 
-            return View(post);
-            //return Ok(post);
+            //return View(post);
+            return Ok(post);
         }
 
         [HttpDelete, Route("DeletePost")]
@@ -190,15 +190,17 @@ namespace Skillap.MVC.Controllers
                                        where lp.isCreator == true
                                        select p).FirstOrDefaultAsync();
 
-                if (!this.User.IsInRole("Admin") && usersPost == null)
-                {
-                    return BadRequest("Seems like you cannot do this via your claims or you're not a creator of the post");
-                }
-                else
+                if (this.User.IsInRole("Admin") || usersPost != null)
                 {
                     await UoW.Posts.DeleteAsync(post.Id);
 
-                    return Ok();
+                    return Ok("Post was deleted");
+
+                    //return BadRequest("Seems like you cannot do this via your claims or you're not a creator of the post");
+                }
+                else
+                {
+                    return BadRequest();
                     //return RedirectToAction("ManagePosts");
                 }
             }
@@ -237,20 +239,18 @@ namespace Skillap.MVC.Controllers
                 return View("NotFound");
             }
             
-            if (!this.User.IsInRole("Admin") && usersComment != null)
-            {
-                return BadRequest();
-                //return RedirectToAction("ManagePosts");
-            }
-            else
+            if (usersComment != null || this.User.IsInRole("Admin"))
             {
                 await UoW.Comments.DeleteAsync(comment.Id);
                 await postChatHub.Clients.All.SendAsync("LoadComments");
 
                 return Ok();
+                //return BadRequest();
+                //return RedirectToAction("ManagePosts");
             }
-
-            //return BadRequest();
+               
+            
+            return BadRequest();
         }
 
         //[Authorize]

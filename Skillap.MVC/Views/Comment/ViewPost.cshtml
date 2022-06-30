@@ -1,18 +1,22 @@
 ﻿@using Skillap.BLL.DTO;
 @using Skillap.DAL.Entities;
-@using Skillap.MVC.ViewModels
+@using Skillap.MVC.ViewModels;
+@using Skillap.DAL.Interfaces;
+@inject IUnitOfWork uow;
 @model Posts;
-@*
-   
-*@
+@{
+    var tags = await uow.Tags.FindAsync(x => x == Model.PostTags.Where(i => i.TagId == x.Id));
+}
 
 
 <div class="container">
     <div class="row">
         <div class="col">
-            <span>@Model.Name</span>
+@*            <span>@Model.Name</span>
             <span>@Model.Description</span>
             <span>@Model.CreatedTime</span>
+            <br />
+            <span>@tags</span>*@
 
             @foreach (var pl in Model.PostsLiked.Where(i => i.PostId == Model.Id))
             {

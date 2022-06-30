@@ -4,6 +4,7 @@
 @using Skillap.DAL.Interfaces 
 @using Skillap.BLL.Interfaces.IServices;
 @using Skillap.DAL.EF; 
+@using Microsoft.EntityFrameworkCore; 
 @inject IAuthService userService;
 @inject IUnitOfWork uow; 
 @inject DataContext db;
@@ -14,6 +15,13 @@
 
     //sum = Model.PostsLiked.Where(pl => pl.PostId == Model.Id && pl.UserId == user.Id).Select(t => t.Score).Sum();
     sum = db.LikedPosts.Where(pl => pl.PostId == Model.Id).Sum(t => t.Score);
+    var tags = await (from t in db.Tags
+                      join pt in db.PostsTags
+                      on t.Id equals pt.TagId
+                      join p in db.Posts
+                      on pt.PostId equals p.Id
+                      where p.Id == Model.Id
+                      select t).ToListAsync();
     //sum = await uow.LikedPosts.FindAsync(pl => pl.PostId == Model.Id);
 
     Layout = "~/Views/Shared/_PostLayout.cshtml";
@@ -26,6 +34,12 @@
             <span>@Model.Name</span>
             <span>@Model.Description</span>
             <span>@Model.CreatedTime</span>
+            <br />
+            <span>@foreach (Tags t in tags)
+                    {
+                        <span>@t.Name</span>
+                    }
+            </span>
 
             <div>
                 <p>
@@ -56,7 +70,7 @@
 
                 <div id="#comment">
                     <p>
-                        @c.Content --- @c.CreatedTime
+                        @c.Content --- @c.CreatedTime --- <span>@Html.ActionLink("Like", "LikeComment", "Post", new { id = c.Id })</span> / <span>@Html.ActionLink("Dislike", "DislikeComment", "Post", new { id = c.Id })</span>
                     </p>
                 </div>
 

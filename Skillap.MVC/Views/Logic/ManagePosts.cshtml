@@ -8,16 +8,17 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <form method="get">
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-md-6">
             <label for="name" class="form-label">Find by name: </label>
             <input id="name" name="name" value="@Model.FilterViewModel.SelectedName" class="form-control" />
         </div>
+        <div class="col-md-2">
+            <label style="opacity:0" for="button" class="form-label">Categories: </label>
+            <input id="button" type="submit" value="Filter" class="btn btn-outline-dark col" />
+        </div>
     </div>
-    <div class="col-md-2">
-        <label style="opacity:0" for="button" class="form-label">Categories: </label>
-        <input id="button" type="submit" value="Filter" class="btn btn-outline-dark col" />
-    </div>
+    
 </form>
 <table class="table">
     <tr>
@@ -47,8 +48,8 @@
             <td> @p.Status</td>
             <td>
                 <form asp-action="DeletePost" asp-route-id="@p.Id" method="post">
-                    <a asp-action="EditPost" asp-controller="Logic" asp-route-id="@p.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="ViewPost" asp-controller="Comment" asp-route-id="@p.Id" class="btn btn-primary">View</a>
+                    <a asp-action="EditPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="ViewPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">View</a>
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>

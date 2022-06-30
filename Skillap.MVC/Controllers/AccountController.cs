@@ -215,7 +215,7 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, Route("Register")]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (!new EmailAddressAttribute().IsValid(registerViewModel.Email))
@@ -357,8 +357,8 @@ namespace Skillap.MVC.Controllers
             //return Ok(model);
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost, Route("EditProfile")]
+        //[Authorize]
         public async Task<IActionResult> EditProfile(EditUserViewModel model)
         {
             if (User.IsInRole("User"))
@@ -436,7 +436,8 @@ namespace Skillap.MVC.Controllers
                 if (res.Succeeded)
                 {
                     await userService.SignOut();
-                    return RedirectToAction("Login", "Account");
+                    return Ok("Your password was changed");
+                    //return RedirectToAction("Login", "Account");
                 }
             }
 

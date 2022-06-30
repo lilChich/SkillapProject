@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Skillap.BLL.DTO;
 using Skillap.BLL.Interfaces.IServices;
+using Skillap.BLL.Models;
 using Skillap.DAL.EF;
 using Skillap.DAL.Entities;
 using Skillap.DAL.Interfaces;
@@ -105,7 +106,7 @@ namespace Skillap.MVC.Controllers
 
         //[Authorize]
         [HttpGet, Route("ManagePosts")]
-        public IActionResult ManagePosts()
+        public async Task<IActionResult> ManagePosts(string name, int page = 1, SortType sort = SortType.NameAsc)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
@@ -113,6 +114,7 @@ namespace Skillap.MVC.Controllers
             }
 
             //var posts = await UoW.Posts.FindAsync(x => true);
+            var viewModel = await secondUserService.LoadPostsAsync(name, page, sort, 3);
             var posts = secondUserService.GetAllPosts();
             return Ok(posts);
             //return Unauthorized();
@@ -325,8 +327,8 @@ namespace Skillap.MVC.Controllers
                     return RedirectToAction("ManageUsers");
                 }*/
 
-                master.ApplicationUserId = model.UserId;
-                master.MasterClassId = model.MasterClassId;
+                master.ApplicationUserId = model.SelectedUser;
+                master.MasterClassId = model.SelectedMasterClass;
                 master.SkillLevel = model.SkillLevel;
                 master.Status = model.Status;
 
@@ -382,15 +384,21 @@ namespace Skillap.MVC.Controllers
 
                 //var result = await appUser.UpdateAsync(user);
 
-                //var res = db.Set<MasterClasses>().Update(currentMasterClass);
-                try
+                var res = db.Set<MasterClasses>().Update(currentMasterClass);
+
+                if (res != null)
+                {
+                    await res.Context.SaveChangesAsync();
+                    return Ok(model);
+                }
+/*                try
                 {
                     await UoW.MasterClasses.UpdateAsync(currentMasterClass);
                 }
                 catch
                 {
                     throw new Exception();
-                }
+                }*/
                 
 
                 /*if (res != null)
