@@ -57,7 +57,7 @@ namespace Skillap.MVC.Controllers
         }
 
         //[HttpGet, Route("Login")]
-        [HttpGet, Route("Login")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
         {
@@ -161,8 +161,8 @@ namespace Skillap.MVC.Controllers
             return View("Error");
         }
 
-        [HttpPost, Route("Login")]
-        //[ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromForm] LoginViewModel loginViewModel)
         {
             if (loginViewModel.ExternalLogins == null)
@@ -193,8 +193,8 @@ namespace Skillap.MVC.Controllers
                 var res = await userService.Login(user);
                 if (res.Token != null)
                 {
-                    return Ok(res);
-                    //return RedirectToAction("Index", "Home");
+                    //return Ok(res);
+                    return RedirectToAction("Index", "Home");
                 }
             }
             catch (ValidationExceptions ex)
@@ -204,8 +204,8 @@ namespace Skillap.MVC.Controllers
             
             //ModelState.AddModelError("", "Incorrect data");
 
-            return Ok(loginViewModel);
-            //return View(loginViewModel);
+            //return Ok(loginViewModel);
+            return View(loginViewModel);
         }
 
         [HttpGet]
@@ -215,7 +215,7 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [HttpPost, Route("Register")]
+        [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (!new EmailAddressAttribute().IsValid(registerViewModel.Email))
@@ -267,15 +267,15 @@ namespace Skillap.MVC.Controllers
 
             if (res.Succeeded)
             {
-                return Ok(registerViewModel);
-                //return RedirectToAction("Index", "Home", registerViewModel);
+                //return Ok(registerViewModel);
+                return RedirectToAction("Index", "Home", registerViewModel);
             }
 
             return View(registerViewModel);
         }
 
-        [HttpGet, Route("EditProfile")]
-        //[Authorize]
+        [HttpGet]
+        [Authorize]
         public async Task<IActionResult> EditProfile()
         {
             var user = await userService.GetUserAsync(this.User.Identity.Name);
@@ -301,7 +301,8 @@ namespace Skillap.MVC.Controllers
                     NickName = user.NickName
                 };
 
-                return Ok(model);
+                return View(model);
+                //return Ok(model);
             }
             else
             {
@@ -311,8 +312,8 @@ namespace Skillap.MVC.Controllers
             //return View(model);
         }
 
-        [HttpGet, Route("MyProfile")]
-        //[Authorize]
+        [HttpGet]
+        [Authorize]
         public async Task<IActionResult> MyProfile()
         {
             var user = await userService.GetUserAsync(this.User.Identity.Name);
@@ -345,8 +346,8 @@ namespace Skillap.MVC.Controllers
                                   select role).ToListAsync()
                 };
 
-                return Ok(model);
-                //return View(model);
+                //return Ok(model);
+                return View(model);
             }
             else
             {
@@ -357,8 +358,8 @@ namespace Skillap.MVC.Controllers
             //return Ok(model);
         }
 
-        [HttpPost, Route("EditProfile")]
-        //[Authorize]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> EditProfile(EditUserViewModel model)
         {
             if (User.IsInRole("User"))
@@ -415,8 +416,8 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [HttpPost, Route("ChangePassword")]
-        //[Authorize]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -436,16 +437,16 @@ namespace Skillap.MVC.Controllers
                 if (res.Succeeded)
                 {
                     await userService.SignOut();
-                    return Ok("Your password was changed");
-                    //return RedirectToAction("Login", "Account");
+                    //return Ok("Your password was changed");
+                    return RedirectToAction("Login", "Account");
                 }
             }
 
-            return Unauthorized();
-            //return View(model);
+            //return Unauthorized();
+            return View(model);
         }
 
-        [HttpPost, Route("Logout")]        
+        //[HttpPost]        
         public async Task<IActionResult> Logout()
         {        
             if (!this.User.Identity.IsAuthenticated)
@@ -455,9 +456,9 @@ namespace Skillap.MVC.Controllers
             else
             {
                 await userService.SignOut();
-                return Ok();
+                //return Ok();
             }
-            //return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

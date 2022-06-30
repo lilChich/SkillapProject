@@ -72,11 +72,11 @@ namespace Skillap.MVC.Controllers
             //var comments = db.Comments.Where(c => c.PostId == post.Id).ToList();
             post.Comments = new List<Comments>(comments);
 
-            return Ok(post);
-            //return View(post);
+            //return Ok(post);
+            return View(post);
         }
 
-        [HttpPost, Route("Post/ViewPost")]
+        [HttpPost]
         public async Task<IActionResult> ViewPost(CommentViewModel vm)
         {
             if (!this.User.Identity.IsAuthenticated)
@@ -148,16 +148,17 @@ namespace Skillap.MVC.Controllers
             post.PostTags = new List<Post_Tags>(postTags);
             await postChatHub.Clients.All.SendAsync("LoadComments");
 
-            //return View(post);
-            return Ok(post);
+            return View(post);
+            //return Ok(post);
         }
 
-        [HttpDelete, Route("DeletePost")]
+        [Authorize]
+        //[HttpDelete]
         public async Task<IActionResult> DeletePost(int id)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userManager.FindByEmailAsync(this.User.Identity.Name);
@@ -194,13 +195,14 @@ namespace Skillap.MVC.Controllers
                 {
                     await UoW.Posts.DeleteAsync(post.Id);
 
-                    return Ok("Post was deleted");
-
+                    return RedirectToAction("ManagePosts", "Logic");
+                    //return Ok("Post was deleted");
                     //return BadRequest("Seems like you cannot do this via your claims or you're not a creator of the post");
                 }
                 else
                 {
-                    return BadRequest();
+                    return BadRequest("Seems like you cannot do this via your claims or you're not a creator of the post");
+                    //return View();
                     //return RedirectToAction("ManagePosts");
                 }
             }
@@ -210,13 +212,13 @@ namespace Skillap.MVC.Controllers
             }
         }
 
-        //[Authorize]
-        [HttpDelete, Route("DeleteComment")]
+        [Authorize]
+        [HttpDelete]
         public async Task<IActionResult> DeleteComment(int id)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userManager.FindByEmailAsync(this.User.Identity.Name);
@@ -244,22 +246,59 @@ namespace Skillap.MVC.Controllers
                 await UoW.Comments.DeleteAsync(comment.Id);
                 await postChatHub.Clients.All.SendAsync("LoadComments");
 
-                return Ok();
+                //return Ok();
                 //return BadRequest();
-                //return RedirectToAction("ManagePosts");
+                return RedirectToAction("ManagePosts");
             }
                
             
             return BadRequest();
         }
 
-        //[Authorize]
-        [HttpPost, Route("EditPost")]
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> EditPost(int id)
+        {
+            var post = await UoW.Posts.GetByIdAsync(id);
+
+            if (post == null)
+            {
+                ViewBag.ErrorMassage = $"Post with Id = {id} cannot be found";
+                return View("NotFound");
+            }
+
+            var tags = await (from t in db.Tags
+                              join pt in db.PostsTags
+                              on t.Id equals pt.TagId
+                              join p in db.Posts
+                              on pt.PostId equals p.Id
+                              where p.Id == post.Id
+                              select t).ToListAsync();
+
+
+
+            var model = new EditPostViewModel
+            {
+                Name = post.Name,
+                Description = post.Description,
+                Status = post.Status
+            };
+
+            foreach (Tags t in tags)
+            {
+                model.Tags += t.Name + " ";
+            }
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
         public async Task<IActionResult> EditPost(EditPostViewModel model)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userManager.FindByEmailAsync(this.User.Identity.Name);
@@ -293,6 +332,11 @@ namespace Skillap.MVC.Controllers
                     post.Name = model.Name;
                     post.Description = model.Description;
                     post.Status = model.Status;
+
+                    if (model.Tags == null)
+                    {
+                        goto marked;
+                    }
 
                     string pattern = @"\B(\#[a-zA-Z0-9]+\b)(?!;)";
 
@@ -355,11 +399,13 @@ namespace Skillap.MVC.Controllers
                             post.PostTags.Add(post_Tags);
                         }   
                     }
+                    marked:
                     await UoW.Posts.UpdateAsync(post);
                     await postChatHub.Clients.All.SendAsync("ViewPost");
                     //var res = await db.Set<Posts>().UpdateAsync(post);
 
-                    return Ok(post);
+                    return RedirectToAction("ManagePosts", "Logic");
+                    //return Ok(post);
                 }
             }
             catch
@@ -370,12 +416,13 @@ namespace Skillap.MVC.Controllers
             //return View(model);
         }
 
-        [HttpPost, Route("Like")]
+        //[Authorize]
+        //[HttpPost]
         public async Task<IActionResult> Like(int id)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userService.GetUserAsync(this.User.Identity.Name);
@@ -478,16 +525,17 @@ namespace Skillap.MVC.Controllers
                     throw new Exception();
                 }
             }
-            return Ok(post);
-            //return RedirectToAction("ViewPost", "Comment", new { id = id });
+            //return Ok(post);
+            return RedirectToAction("ViewPost", "Post", new { id = id });
         }
 
-        [HttpPost, Route("Dislike")]
+        //[Authorize]
+        //[HttpPost]
         public async Task<IActionResult> Dislike(int id)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userService.GetUserAsync(this.User.Identity.Name);
@@ -590,20 +638,22 @@ namespace Skillap.MVC.Controllers
                 }
             }
 
-            return Ok(post);
-            //return RedirectToAction("ViewPost", "Comment", new { id = id });
+            //return Ok(post);
+            return RedirectToAction("ViewPost", "Post", new { id = id });
         }
 
-        [HttpPost, Route("LikeComment")]
-        public async Task<IActionResult> LikeComment(int id)
+        //[Authorize]
+        //[HttpPost]
+        public async Task<IActionResult> LikeComment(int id, int postId)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userService.GetUserAsync(this.User.Identity.Name);
             var comment = await UoW.Comments.GetByIdAsync(id);
+            var post = await db.Posts.Where(x => x.Id == postId).FirstOrDefaultAsync();
 
             var commentToLike = await db.LikedComments.Where(c => c.CommentId == id && c.UserId == user.Id).FirstOrDefaultAsync();
             //var likedPost = new Liked_PostsDTO();
@@ -702,20 +752,22 @@ namespace Skillap.MVC.Controllers
                     throw new Exception();
                 }
             }
-            return Ok(comment);
-            //return RedirectToAction("ViewPost", "Comment", new { id = id });
+            //return Ok(comment);
+            return RedirectToAction("ViewPost", "Post", new { id = post.Id });
         }
 
-        [HttpPost, Route("DislikeComment")]
-        public async Task<IActionResult> DislikeComment(int id)
+        //[Authorize]
+        //[HttpPost]
+        public async Task<IActionResult> DislikeComment(int id, int postId)
         {
             if (!this.User.Identity.IsAuthenticated)
             {
-                return Unauthorized();
+                return RedirectToAction("Login", "Account");
             }
 
             var user = await userService.GetUserAsync(this.User.Identity.Name);
             var comment = await db.Comments.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var post = await db.Posts.Where(x => x.Id == postId).FirstOrDefaultAsync();
 
             var commentToDislike = await db.LikedComments.Where(c => c.CommentId == id && c.UserId == user.Id).FirstOrDefaultAsync();
 
@@ -814,8 +866,8 @@ namespace Skillap.MVC.Controllers
                 }
             }
 
-            return Ok(comment);
-            //return RedirectToAction("ViewPost", "Comment", new { id = id });
+            //return Ok(comment);
+            return RedirectToAction("ViewPost", "Post", new { id = post.Id });
         }
     }
 }

@@ -70,7 +70,7 @@
 
                 <div id="#comment">
                     <p>
-                        @c.Content --- @c.CreatedTime --- <span>@Html.ActionLink("Like", "LikeComment", "Post", new { id = c.Id })</span> / <span>@Html.ActionLink("Dislike", "DislikeComment", "Post", new { id = c.Id })</span>
+                        @c.Content --- @c.CreatedTime --- <span>@Html.ActionLink("Like", "LikeComment", "Post", new { id = c.Id, postId = Model.Id })</span> / <span>@Html.ActionLink("Dislike", "DislikeComment", "Post", new { id = c.Id, postId = Model.Id })</span>
                     </p>
                 </div>
 

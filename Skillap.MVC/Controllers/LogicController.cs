@@ -50,62 +50,68 @@ namespace Skillap.MVC.Controllers
 
         }
 
-        //[Authorize]
-        [HttpGet, Route("ManageMasterClasses")]
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> ManageMasterClasses()
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
 
-            var masterClasses = await UoW.MasterClasses.FindAsync(x => true);
-            return Ok(masterClasses);
+            var masterClasses = userService.GetAllMasterClassesAsync();
+            //var masterClasses = await UoW.MasterClasses.FindAsync(x => true);
+            return View(masterClasses);
+            //return Ok(masterClasses);
         }
 
-        //[Authorize]
-        [HttpGet, Route("ManageUsers")]
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> ManageUsers()
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
 
-            var users = await UoW.ApplicationUsers.FindAsync(x => true);
-            //var users = secondUserService.GetAllUsersAsync();
-            return Ok(users);
+            //var users = await UoW.ApplicationUsers.FindAsync(x => true);
+            var users = secondUserService.GetAllUsersAsync();
+            return View(users);
+            //return Ok(users);
         }
 
-        //[Authorize]
-        [HttpGet, Route("ManageMasters")]
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> ManageMasters()
         {
             if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
-
-            var masters = await UoW.Masters.FindAsync(x => true);
-            return Ok(masters);
+            var masters = userService.GetAllMastersAsync();
+            //var masters = await UoW.Masters.FindAsync(x => true);
+            return View(masters);
+            //return Ok(masters);
         }
 
-        //[Authorize]
-        [HttpGet, Route("ManageTags")]
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> ManageTags()
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
 
             var tags = secondUserService.GetAllTags();
             //var tags = await UoW.Tags.FindAsync(x => true);
-            return Ok(tags);
+
+            return View(tags);
+            //return Ok(tags);
         }
 
         //[Authorize]
-        [HttpGet, Route("ManagePosts")]
+        [HttpGet]
         public async Task<IActionResult> ManagePosts(string name, int page = 1, SortType sort = SortType.NameAsc)
         {
             if (!this.User.Identity.IsAuthenticated)
@@ -116,11 +122,13 @@ namespace Skillap.MVC.Controllers
             //var posts = await UoW.Posts.FindAsync(x => true);
             var viewModel = await secondUserService.LoadPostsAsync(name, page, sort, 3);
             var posts = secondUserService.GetAllPosts();
-            return Ok(posts);
+            return View(viewModel);
+            //return Ok(posts);
             //return Unauthorized();
         }
 
-        [HttpDelete, Route("DeleteUser")]
+        [Authorize]
+        [HttpDelete]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
@@ -139,12 +147,12 @@ namespace Skillap.MVC.Controllers
                 else
                 {
                     var res = await secondUserService.DeleteUserAsync(user);
-                    //var users = secondUserService.GetAllUsersAsync();
+                    var users = secondUserService.GetAllUsersAsync();
 
                     if (res.Succeeded)
                     {
-                        return Ok(res);
-                        //return RedirectToAction("ManageUsers", users);
+                        //return Ok(res);
+                        return RedirectToAction("ManageUsers", users);
                     }
 
                     return BadRequest("Can't delete user");
@@ -154,10 +162,11 @@ namespace Skillap.MVC.Controllers
            
         }
 
-        [HttpGet, Route("EditUsers")]
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> EditUsers(int id)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -190,14 +199,15 @@ namespace Skillap.MVC.Controllers
 
             };
 
-            return Ok(model);
-            //return View(model);
+            //return Ok(model);
+            return View(model);
         }
 
-        [HttpPost, Route("EditUsers")]
+        [Authorize]
+        [HttpPost]
         public async Task<IActionResult> EditUsers(EditUserViewModel model)
         {
-            if (!this.User.Identity.IsAuthenticated)
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -239,17 +249,18 @@ namespace Skillap.MVC.Controllers
 
                 await UoW.ApplicationUsers.UpdateAsync(user);
 
-                return Ok(user);
-                //return RedirectToAction("ManageUsers", "Logic");
+                //return Ok(user);
+                return RedirectToAction("ManageUsers", "Logic");
                 
             }
 
             ModelState.AddModelError("", "Something goes wrong while updating");
 
-            return BadRequest("Something went wrong");
-            //return View(model);
+            //return BadRequest("Something went wrong");
+            return View(model);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> EditMasterClasses(int id)
         {
@@ -276,6 +287,7 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> EditMaster(int id)
         {
@@ -301,10 +313,11 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        [HttpPost, Route("EditMaster")]
+        [Authorize]
+        [HttpPost]
         public async Task<IActionResult> EditMaster(EditMasterViewModel model)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -339,19 +352,20 @@ namespace Skillap.MVC.Controllers
                 if (res != null)
                 {
                     await res.Context.SaveChangesAsync();
-                    return Ok(model);
-                    //return RedirectToAction("ManageMasters");
+                    //return Ok(model);
+                    return RedirectToAction("ManageMasters");
                 }
 
-                return BadRequest();
-                //return View(model);
+                //return BadRequest();
+                return View(model);
             }
         }
 
-        [HttpPost, Route("EditMasterClasses")]
+        [Authorize]
+        [HttpPost]
         public async Task<IActionResult> EditMasterClasses(EditMasterClassViewModel model)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -389,7 +403,8 @@ namespace Skillap.MVC.Controllers
                 if (res != null)
                 {
                     await res.Context.SaveChangesAsync();
-                    return Ok(model);
+                    return RedirectToAction("ManageMasterClasses");
+                    //return Ok(model);
                 }
 /*                try
                 {
@@ -407,15 +422,16 @@ namespace Skillap.MVC.Controllers
                     return RedirectToAction("ManageMasterClasses");
                 }*/
 
-                return Ok(currentMasterClass);
-                //return View(model);
+                //return Ok(currentMasterClass);
+                return View(model);
             }
         }
 
-        [HttpDelete, Route("DeleteMasterClass")]
+        [Authorize]
+        [HttpDelete]
         public async Task<IActionResult> DeleteMasterClass(int id)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -431,17 +447,19 @@ namespace Skillap.MVC.Controllers
             {
                 var res = await userService.DeleteMasterClass(masterClass);
 
-                if (!res)
+                if (res)
                 {
                     return RedirectToAction("ManageMasterClasses");
                 }
                 //var masterClasses = userService.GetAllMasterClassesAsync();
-                return Ok();
+                return View();
+                //return Ok();
                 //return View("ManageMasterClasses", masterClasses);
             }
         }
 
-        [HttpDelete, Route("DeleteMaster")]
+        [Authorize]
+        [HttpDelete]
         public async Task<IActionResult> DeleteMaster(int id)
         {
             var master = await userService.GetMasterByIdAsync(id);
@@ -456,8 +474,8 @@ namespace Skillap.MVC.Controllers
                 await UoW.Masters.DeleteAsync(master.Id);
                 await UoW.Masters.SaveAsync();
 
-                return Ok();
-                //return RedirectToAction("ManageMasters");
+                //return Ok();
+                return RedirectToAction("ManageMasters");
             }
 
         }
@@ -508,8 +526,8 @@ namespace Skillap.MVC.Controllers
             return PartialView(sortedList);
         }
 
-        //[Authorize]
-        [HttpPost, Route("Masters")]
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Masters(MastersViewModel modelMasters)
         {
             var user = db.Users.Where(u => u.Id == modelMasters.SelectedUser).FirstOrDefault();
@@ -531,7 +549,8 @@ namespace Skillap.MVC.Controllers
                 };
 
                 await UoW.Masters.CreateAsync(masterDto);
-                return Ok(masterDto);
+                //return RedirectToAction("ManageMasters");
+                //return Ok(masterDto);
             }
             catch
             {
@@ -540,9 +559,9 @@ namespace Skillap.MVC.Controllers
 
 
 
-            //var masters = userService.GetAllMastersAsync();
+            var masters = userService.GetAllMastersAsync();
             
-            //return View("ManageMasters", masters);
+            return View("ManageMasters", masters);
         }
 
         [Authorize]
@@ -552,8 +571,8 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        //[Authorize]
-        [HttpPost, Route("MasterClasses")]
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> MasterClasses(MasterClassViewModel model)
         {
             if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
@@ -599,9 +618,9 @@ namespace Skillap.MVC.Controllers
                 throw new Exception();
             }
 
-            //var allMasterClasses = userService.GetAllMasterClassesAsync();
-            return Ok(masterClass);
-            //return View("ManageMasterClasses", allMasterClasses);
+            var allMasterClasses = userService.GetAllMasterClassesAsync();
+            //return Ok(masterClass);
+            return View("ManageMasterClasses", allMasterClasses);
         }
 
         [Authorize]
@@ -611,10 +630,11 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        [HttpPost, Route("Tag")]
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Tag(TagViewModel model)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -651,9 +671,10 @@ namespace Skillap.MVC.Controllers
             {
                 throw new Exception("Something went wrong");
             }
-            //var allTags = secondUserService.GetAllTags();
-            return Ok(tag);
-            //return View("ManageTags", allTags);
+            
+            var allTags = secondUserService.GetAllTags();
+            //return Ok(tag);
+            return View("ManageTags", allTags);
         }
 
         [Authorize]
@@ -678,10 +699,11 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        [HttpPost, Route("EditTag")]
+        [Authorize]
+        [HttpPost]
         public async Task<IActionResult> EditTag(EditTagViewModel model)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -697,9 +719,9 @@ namespace Skillap.MVC.Controllers
             {
                 tag.Name = model.Name;
 
-                //var res = db.Set<Tags>().Update(tag);
+                var res = db.Set<Tags>().Update(tag);
 
-                try
+                /*try
                 {
                     await UoW.Tags.UpdateAsync(tag);
                     return Ok(model);
@@ -707,22 +729,23 @@ namespace Skillap.MVC.Controllers
                 catch
                 {
                     throw new Exception();
-                }
-                
-/*                if (res != null)
+                }*/
+
+                if (res != null)
                 {
                     await res.Context.SaveChangesAsync();
                     return RedirectToAction("ManageTags");
-                }*/
+                }
 
-                //return View(model);
+                return View(model);
             }
         }
 
-        [HttpDelete, Route("DeleteTag")]
+        [Authorize]
+        [HttpDelete]
         public async Task<IActionResult> DeleteTag(int id)
         {
-            if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
+            if (!this.User.IsInRole("Admin"))
             {
                 return Unauthorized();
             }
@@ -738,8 +761,8 @@ namespace Skillap.MVC.Controllers
             {
                 await UoW.Tags.DeleteAsync(tag.Id);
 
-                return Ok();
-                //return RedirectToAction("ManageTags");
+                //return Ok();
+                return RedirectToAction("ManageTags");
             }
 
         }
@@ -751,8 +774,8 @@ namespace Skillap.MVC.Controllers
             return View();
         }
 
-        //[Authorize]
-        [HttpPost, Route("Post")]
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Post(PostViewModel model)
         {
             if (!this.User.Identity.IsAuthenticated)
@@ -862,9 +885,9 @@ namespace Skillap.MVC.Controllers
                 throw new Exception("Something went wrong");
             }
 
-            return Ok(post);
-            //var allPosts = secondUserService.GetAllPosts();
-            //return View("ManagePosts", allPosts);
+            //return Ok(post);
+            var allPosts = secondUserService.GetAllPosts();
+            return RedirectToAction("ManagePosts", "Logic");
         }
 
         /*[Authorize]
@@ -982,28 +1005,7 @@ namespace Skillap.MVC.Controllers
             return RedirectToAction("F", "Comment", new { id = id });
         }*/
 
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> EditPost(int id)
-        {
-            var post = await UoW.Posts.GetByIdAsync(id);
-
-            if (post == null)
-            {
-                ViewBag.ErrorMassage = $"Post with Id = {id} cannot be found";
-                return View("NotFound");
-            }
-
-            var model = new EditPostViewModel
-            {
-                Name = post.Name,
-                Description = post.Description,
-                Status = post.Status
-
-            };
-
-            return View(model);
-        }
+       
 
         /*[Authorize]
         [HttpPost]

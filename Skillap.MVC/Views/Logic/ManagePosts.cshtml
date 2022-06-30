@@ -50,7 +50,7 @@
                 <form asp-action="DeletePost" asp-route-id="@p.Id" method="post">
                     <a asp-action="EditPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">Edit</a>
                     <a asp-action="ViewPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">View</a>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <a type="submit" asp-action="DeletePost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-danger">Delete</a>
                 </form>
             </td>
         </tr>
