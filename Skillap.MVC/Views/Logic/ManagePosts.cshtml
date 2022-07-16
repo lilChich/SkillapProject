@@ -1,11 +1,30 @@
 ﻿@using Skillap.BLL.Models
 @using Skillap.BLL.DTO
+@using Skillap.DAL.Interfaces
+@using Skillap.DAL.EF
+@using Skillap.DAL.Entities 
+@using Microsoft.AspNetCore.Identity 
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<ApplicationUsers> userManager
+@inject DataContext db
+@inject IUnitOfWork uow
 @model PostMenuModel
 @*@model IEnumerable<Skillap.BLL.DTO.PostsDTO>*@
 
 @{
     ViewData["Title"] = "ManageUsers";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    @*var user = userManager.FindByEmailAsync(this.User.Identity.Name);
+
+    var usersPost = await (from p in db.Posts
+                           join lp in db.LikedPosts
+                           on p.Id equals lp.PostId
+                           join creator in db.Users
+                           on lp.UserId equals user.Id
+                           where creator.Id == user.Id
+                           where lp.isCreator == true
+                           select p).ToListAsync();*@
 }
 <form method="get">
     <div class="row mb-2">
@@ -15,10 +34,14 @@
         </div>
         <div class="col-md-2">
             <label style="opacity:0" for="button" class="form-label">Categories: </label>
-            <input id="button" type="submit" value="Filter" class="btn btn-outline-dark col" />
+            <input id="button" type="submit" value="Search" class="btn btn-outline-dark col" />
+        </div>
+        <div class="col-md-2">
+            <label style="opacity:0" for="button" class="form-label">Categories: </label>
+            <input formmethod="get" id="button" type="submit" value="Add New" class="btn btn-outline-dark col" asp-action="Post" asp-controller="Logic" />
         </div>
     </div>
-    
+
 </form>
 <table class="table">
     <tr>
@@ -48,7 +71,12 @@
             <td> @p.Status</td>
             <td>
                 <form asp-action="DeletePost" asp-route-id="@p.Id" method="post">
-                    <a asp-action="EditPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">Edit</a>
+
+                    @if (this.User.IsInRole("Admin"))
+                    {
+                        <a asp-action="EditPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">Edit</a>
+                    }
+
                     <a asp-action="ViewPost" asp-controller="Post" asp-route-id="@p.Id" class="btn btn-primary">View</a>
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>

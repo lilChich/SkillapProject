@@ -1,3 +1,5 @@
 ﻿@using Skillap.MVC
 @using Skillap.MVC.Models
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+@inject Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Builder.RequestLocalizationOptions> locOptions
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

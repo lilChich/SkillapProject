@@ -26,6 +26,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
 using Skillap.BLL.Hubs;
+using Microsoft.AspNetCore.Mvc.Razor;
+using System.Globalization;
+using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 
 namespace Skillap.MVC
 {
@@ -43,12 +47,29 @@ namespace Skillap.MVC
         {
             //services.AddMediatR(typeof(LoginHandler).Assembly);
             services.AddAutoMapper(Assembly.Load("Skillap.MVC"), Assembly.Load("Skillap.DAL"));
-            services.AddAutoMapper(Assembly.Load("Skillap.BLL"), Assembly.Load("Skillap.DAL"));
+            services.AddAutoMapper(Assembly.Load("Skillap.BLL"), Assembly.Load("Skillap.DAL"));          
 
-            /*services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
+            services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix).AddDataAnnotationsLocalization();
+
+            services.Configure<RequestLocalizationOptions>(
+                opt =>
+                {
+                    var supportedCultures = new List<CultureInfo>
+                    {
+                        new CultureInfo("en"),
+                        new CultureInfo("uk")
+                    };
+                    opt.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en");
+                    opt.SupportedCultures = supportedCultures;
+                    opt.SupportedUICultures = supportedCultures;
+                });
+
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
-            services.AddMvc();*/
-            services.AddSignalR();
+
+            services.AddSignalR();          
+
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
@@ -159,6 +180,14 @@ namespace Skillap.MVC
 
 
             app.UseAuthorization();
+
+            app.UseRequestLocalization(app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+/*            var supportedCultures = new[] { "en", "uk" };
+            var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+                    .AddSupportedCultures(supportedCultures)
+                    .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);*/
 
 
             app.UseEndpoints(endpoints =>

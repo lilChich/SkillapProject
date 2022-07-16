@@ -39,9 +39,19 @@
                     <p class="card-text text-center">You can ask a question on any topic and get an answer to it quickly enough. People should help solve the hardest questions. And don't forget about master classes.</p>
                     <p class="card-text text-center">Get started</p>
                     <div class="card-text text-center">
-                        <a class="" asp-controller="Account" asp-action="Login">
-                            <div id="buttons">Ask Question</div>
-                        </a>
+                        @if (!this.User.Identity.IsAuthenticated)
+                        {
+                            <a class="" asp-controller="Account" asp-action="Login">
+                                <div id="buttons">Ask Question</div>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="" asp-controller="Logic" asp-action="Post">
+                                <div id="buttons">Ask Question</div>
+                            </a>
+                        }
+
                     </div>
                 </div>
             </div>
@@ -120,59 +130,6 @@
         </div>
     </div>
 </div>
-
-
-@*<div class="container pt-4 mt-4 pb-4">
-        <div class="row pb-5">
-            <div class="col-1">
-
-            </div>
-            <div class="col-1 mt-2">
-                <i class="fas fa-comments fa-4x text-white"></i>
-            </div>
-            <div class="col ml-4">
-                <h2 id="add_text_home">Create chats to keep in touch any time you want</h2>
-                <p id="add_text_home_zag" class="mb-2">Use chat messages to share information in traditional way</p>
-            </div>
-        </div>
-        <div class="row pb-5">
-            <div class="col-1">
-
-            </div>
-            <div class="col-1 text-center mt-2">
-                <i class="fas fa-microphone fa-4x text-white"></i>
-            </div>
-            <div class="col ml-4">
-                <h2 id="add_text_home">Share voice messages</h2>
-                <p id="add_text_home_zag">Use voice messages to tell something you can't describe in text</p>
-            </div>
-        </div>
-        <div class="row pb-5">
-            <div class="col-1">
-
-            </div>
-            <div class="col-1 text-center mt-2">
-                <i class="fas fa-search fa-4x text-white"></i>
-            </div>
-            <div class="col ml-4">
-                <h2 id="add_text_home">Connect to other servers</h2>
-                <p id="add_text_home_zag">Find interesting servers via recommendations or by invite links to join</p>
-            </div>
-        </div>
-        <div class="row pb-5 mb-4">
-            <div class="col-1">
-
-            </div>
-            <div class="col-1 text-center mt-2">
-                <i class="fas fa-user-md fa-4x text-white"></i>
-            </div>
-            <div class="col ml-4">
-                <h2 id="add_text_home">Review your server activity as administrator</h2>
-                <p id="add_text_home_zag">Set up server for your purposes and moderate it by yourself</p>
-            </div>
-        </div>
-    </div>*@
-
 
 <div class="container pb-5 mb-5">
     <div class="row">

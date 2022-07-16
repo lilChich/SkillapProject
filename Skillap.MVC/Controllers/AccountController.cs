@@ -70,7 +70,7 @@ namespace Skillap.MVC.Controllers
             return View(model);
         }
 
-        //[HttpPost, Route("ExternalLogin")]
+        [HttpPost, Route("ExternalLogin")]
         [AllowAnonymous]
         public IActionResult ExternalLogin(string returnUrl, string provider)
         {
@@ -120,8 +120,6 @@ namespace Skillap.MVC.Controllers
             {
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
 
-
-
                 if (email != null)
                 {
 
@@ -143,6 +141,7 @@ namespace Skillap.MVC.Controllers
                             UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
                             Email = info.Principal.FindFirstValue(ClaimTypes.Email),
                             Image = myImage,
+                            
                         };
 
                         await appUser.CreateAsync(user);
@@ -399,7 +398,7 @@ namespace Skillap.MVC.Controllers
 
                 if (updateUser)
                 {
-                    return RedirectToAction("Index","Home");
+                    return RedirectToAction("MyProfile");
                 }
             }
 

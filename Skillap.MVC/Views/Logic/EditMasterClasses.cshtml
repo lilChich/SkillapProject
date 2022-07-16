@@ -10,7 +10,7 @@
 <h4>EditMasterClassViewModel</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-4 offset-md-4">
         <form asp-action="EditMasterClasses">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -44,8 +44,8 @@
                 <span asp-validation-for="Level" class="text-danger"></span>
             </div>
             <div class="form-group row">
-                <button asp-action="EditMasterClasses" type="submit" class="btn btn-primary">Update</button>
-                <a asp-action="ManageMasterClasses" class="btn btn-primary">Cancel</a>
+                <button id="buttonsProfile" asp-action="EditMasterClasses" type="submit" class="btn btn-primary">Update</button>
+                <a id="buttonsProfile" asp-action="ManageMasterClasses" class="btn btn-primary">Cancel</a>
             </div>
 
 

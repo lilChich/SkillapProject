@@ -15,6 +15,7 @@
 
     //sum = Model.PostsLiked.Where(pl => pl.PostId == Model.Id && pl.UserId == user.Id).Select(t => t.Score).Sum();
     sum = db.LikedPosts.Where(pl => pl.PostId == Model.Id).Sum(t => t.Score);
+
     var tags = await (from t in db.Tags
                       join pt in db.PostsTags
                       on t.Id equals pt.TagId
@@ -22,6 +23,17 @@
                       on pt.PostId equals p.Id
                       where p.Id == Model.Id
                       select t).ToListAsync();
+
+    var usersPost = await (from p in db.Posts
+                           join lp in db.LikedPosts
+                           on p.Id equals lp.PostId
+                           where p.Id == Model.Id
+                           join creator in db.Users
+                           on lp.UserId equals user.Id
+                           where creator.Id == user.Id
+                           where lp.isCreator == true
+                           select p).ToListAsync();
+
     //sum = await uow.LikedPosts.FindAsync(pl => pl.PostId == Model.Id);
 
     Layout = "~/Views/Shared/_PostLayout.cshtml";
@@ -31,23 +43,32 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <span>@Model.Name</span>
-            <span>@Model.Description</span>
-            <span>@Model.CreatedTime</span>
+            <p class="text-center">@Model.Name</p>
+            <p class="">@Model.Description</p>
             <br />
-            <span>@foreach (Tags t in tags)
-                    {
-                        <span>@t.Name</span>
-                    }
+            <span>
+                Tags:
+                @foreach (Tags t in tags)
+                {
+                    <span>@t.Name</span>
+                }
             </span>
+            <br />
+            <span class="align-items-end">@Model.CreatedTime</span>
+            @if (usersPost.Count > 0)
+            {
+                <div class=""><a class="btn-primary mr-2" asp-action="EditPost" asp-controller="Post" asp-route-id="@Model.Id">Edit</a><a class="btn-primary" asp-action="DeletePost" asp-controller="Post" asp-route-id="@Model.Id">Delete</a></div>
+            }
+
 
             <div>
-                <p>
+                <span>
                     @Html.ActionLink("Like", "Like", "Post", new { id = Model.Id })
-                </p>
-                <p>
+                </span>
+                /
+                <span>
                     @Html.ActionLink("Dislike", "Dislike", "Post", new { id = Model.Id })
-                </p>
+                </span>
 
 
                 <p>@sum --- Score</p>
@@ -67,7 +88,7 @@
             }
             @foreach (var c in Model.Comments)
             {
-
+                var sum2 = db.LikedComments.Where(lc => lc.CommentId == c.Id).Sum(s => s.Score);
                 <div id="#comment">
                     <p>
                         @c.Content --- @c.CreatedTime --- <span>@Html.ActionLink("Like", "LikeComment", "Post", new { id = c.Id })</span> / <span>@Html.ActionLink("Dislike", "DislikeComment", "Post", new { id = c.Id })</span>
