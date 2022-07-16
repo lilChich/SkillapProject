@@ -128,7 +128,7 @@ namespace Skillap.MVC.Controllers
         }
 
         [Authorize]
-        [HttpDelete]
+        [HttpPost]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (!this.User.Identity.IsAuthenticated || !this.User.IsInRole("Admin"))
