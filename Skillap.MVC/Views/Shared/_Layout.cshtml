@@ -89,14 +89,17 @@
                         <li class="nav-item">
                             <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <li class="nav-item">
+                            <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Logic" asp-action="ManagePosts">Posts</a>
+                        </li>
 
                         @if (signInManager.IsSignedIn(User))
                         {
                             @if (User.IsInRole("Admin"))
                             {
                                 @*<li class="nav-item">
-                                        <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="EditProfile">Admin</a>
-                                    </li>*@
+                    <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="EditProfile">Admin</a>
+                </li>*@
                                 <li class="nav-item">
                                     <a id="header_nav" class="nav-link text-dark" asp-area="" asp-controller="Logic" asp-action="ManageUsers">Admin</a>
                                 </li>

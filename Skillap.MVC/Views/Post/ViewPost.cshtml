@@ -1,16 +1,18 @@
-﻿@using Skillap.BLL.DTO;
-@using Skillap.DAL.Entities;
+﻿@using Skillap.DAL.Entities;
 @using Skillap.MVC.ViewModels;
-@using Skillap.DAL.Interfaces 
+@using Skillap.DAL.Interfaces
 @using Skillap.BLL.Interfaces.IServices;
-@using Skillap.DAL.EF; 
-@using Microsoft.EntityFrameworkCore; 
+@using Skillap.DAL.EF;
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
 @inject IAuthService userService;
-@inject IUnitOfWork uow; 
+@inject IUnitOfWork uow;
 @inject DataContext db;
+@inject UserManager<ApplicationUsers> userManager;
 @model Posts;
 @{
     int? sum = 0;
+    int? sum2 = 0;
     var user = await userService.GetUserAsync(this.User.Identity.Name);
 
     //sum = Model.PostsLiked.Where(pl => pl.PostId == Model.Id && pl.UserId == user.Id).Select(t => t.Score).Sum();
@@ -23,34 +25,51 @@
                       where p.Id == Model.Id
                       select t).ToListAsync();
     //sum = await uow.LikedPosts.FindAsync(pl => pl.PostId == Model.Id);
+   //var user = userManager.FindByEmailAsync(this.User.Identity.Name);
 
-    Layout = "~/Views/Shared/_PostLayout.cshtml";
+    var toDelete = await (from p in db.Posts
+                          join lp in db.LikedPosts
+                          on p.Id equals lp.PostId
+                          where p.Id == Model.Id
+                          join u in db.Users
+                          on lp.UserId equals u.Id
+                          where u.Id == user.Id
+                          select p).FirstOrDefaultAsync();
+
+Layout = "~/Views/Shared/_PostLayout.cshtml";
 }
 
 
 <div class="container">
     <div class="row">
         <div class="col">
-            <span>@Model.Name</span>
-            <span>@Model.Description</span>
-            <span>@Model.CreatedTime</span>
+            <span class="text-center">@Model.Name</span>
             <br />
-            <span>@foreach (Tags t in tags)
-                    {
-                        <span>@t.Name</span>
-                    }
+            <span>@Model.Description</span>
+
+            <br />
+            <span>
+                @foreach (Tags t in tags)
+                {
+                    <span>@t.Name</span>
+                }
             </span>
 
-            <div>
-                <p>
-                    @Html.ActionLink("Like", "Like", "Post", new { id = Model.Id })
-                </p>
-                <p>
-                    @Html.ActionLink("Dislike", "Dislike", "Post", new { id = Model.Id })
-                </p>
+            <br />
+            <span>@Model.CreatedTime</span>
 
+            <div class="pb-2">
+                <p>
+                    @Html.ActionLink("Like", "Like", "Post", new { id = Model.Id }) / @Html.ActionLink("Dislike", "Dislike", "Post", new { id = Model.Id })
+                </p>
 
                 <p>@sum --- Score</p>
+
+                @if (toDelete != null)
+                {
+                    <a asp-action="EditPost" asp-controller="Post" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                    <a type="submit" asp-action="DeletePost" asp-controller="Post" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+                }
 
 
             </div>
@@ -58,25 +77,25 @@
 
 
 
+</div>
+<div class="row">
+    <div class="col">
+        @*@Html.Raw(Model.Comments)*@
+        @{
+            @Html.RenderPartialAsync("MainCommentView", new CommentViewModel { PostId = Model.Id, Id = 0 })
+        }
+        @foreach (var c in Model.Comments)
+        {
+            sum2 = db.LikedComments.Where(lc => lc.CommentId == c.Id).Sum(t => t.Score);
+            <div id="#comment">
+                <p>
+                    @c.Content --- @c.CreatedTime --- @sum2 <span>@Html.ActionLink("Like", "LikeComment", "Post", new { id = c.Id, postId = Model.Id })</span> / <span>@Html.ActionLink("Dislike", "DislikeComment", "Post", new { id = c.Id, postId = Model.Id })</span>
+                </p>
+            </div>
+
+        }
+
     </div>
-    <div class="row">
-        <div class="col">
-            @*@Html.Raw(Model.Comments)*@
-            @{
-                @Html.RenderPartialAsync("MainCommentView", new CommentViewModel { PostId = Model.Id, Id = 0 })
-            }
-            @foreach (var c in Model.Comments)
-            {
-
-                <div id="#comment">
-                    <p>
-                        @c.Content --- @c.CreatedTime --- <span>@Html.ActionLink("Like", "LikeComment", "Post", new { id = c.Id, postId = Model.Id })</span> / <span>@Html.ActionLink("Dislike", "DislikeComment", "Post", new { id = c.Id, postId = Model.Id })</span>
-                    </p>
-                </div>
-
-            }
-
-        </div>
-    </div>
+</div>
 
 </div>
