@@ -428,7 +428,7 @@ namespace Skillap.MVC.Controllers
         }
 
         [Authorize]
-        [HttpDelete]
+        [HttpPost]
         public async Task<IActionResult> DeleteMasterClass(int id)
         {
             if (!this.User.IsInRole("Admin"))
