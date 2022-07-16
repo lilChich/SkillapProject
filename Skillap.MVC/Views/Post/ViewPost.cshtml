@@ -25,7 +25,7 @@
                       where p.Id == Model.Id
                       select t).ToListAsync();
     //sum = await uow.LikedPosts.FindAsync(pl => pl.PostId == Model.Id);
-   //var user = userManager.FindByEmailAsync(this.User.Identity.Name);
+    //var user = userManager.FindByEmailAsync(this.User.Identity.Name);
 
     var toDelete = await (from p in db.Posts
                           join lp in db.LikedPosts
@@ -36,7 +36,7 @@
                           where u.Id == user.Id
                           select p).FirstOrDefaultAsync();
 
-Layout = "~/Views/Shared/_PostLayout.cshtml";
+    Layout = "~/Views/Shared/_PostLayout.cshtml";
 }
 
 
@@ -82,8 +82,9 @@ Layout = "~/Views/Shared/_PostLayout.cshtml";
     <div class="col">
         @*@Html.Raw(Model.Comments)*@
         @{
-            @Html.RenderPartialAsync("MainCommentView", new CommentViewModel { PostId = Model.Id, Id = 0 })
+            await Html.RenderPartialAsync("MainCommentView", new CommentViewModel { PostId = Model.Id, Id = 0 });
         }
+
         @foreach (var c in Model.Comments)
         {
             sum2 = db.LikedComments.Where(lc => lc.CommentId == c.Id).Sum(t => t.Score);
